@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  hof-feedback-form:
+    depends_on:
+      - redis
+    env_file: ".env"
+    build:
+      dockerfile: ./Dockerfile.local
+    networks:
+      - shared-network
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./assets:/app/assets
+      - ./apps:/app/apps
+    restart: on-failure
+
+  redis:
+    image: "redis:alpine"
+    hostname: hof-redis
+    networks:
+      - shared-network
+    ports:
+      - "6379:6379"
+
+networks:
+  shared-network:
+    driver: bridge
