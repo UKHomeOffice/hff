@@ -1,11 +1,8 @@
-# Accept a build Argument named BASE_IMAGE
 FROM node:20.15.0-alpine3.20@sha256:24c14a8a192a6e81d0942929a344f7a4bdf0db8e3b3c77d64a5eb8a4b0c759b7
 USER root
 
-# Update packages as a result of Anchore security vulnerability checks
 RUN apk update && \
     apk add --upgrade gnutls binutils nodejs npm apk-tools libjpeg-turbo libcurl libx11 libxml2
-
 
 # Setup nodejs group & nodejs user
 RUN addgroup --system nodejs --gid 998 && \

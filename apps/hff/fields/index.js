@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  'feedback': {
+  feedback: {
     validate: 'required'
   }
 };

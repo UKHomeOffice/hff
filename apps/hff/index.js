@@ -6,7 +6,7 @@ module.exports = {
   steps: {
     '/feedback': {
       fields: [],
-      next: '/feedback-hope'
+      next: '/feedback-sent'
     }
   }
-}
+};
