@@ -9,8 +9,8 @@ module.exports = {
   env: env,
   govukNotify: {
     notifyApiKey: process.env.NOTIFY_KEY,
-    caseworkerEmail: process.env.FEEDBACK_INBOX,
-    userConfirmationTemplateId: process.env.FEEDBACK_TEMPLATE_ID
+    feedbackInbox: process.env.FEEDBACK_INBOX,
+    feedbackSubmissionTemplateId: process.env.FEEDBACK_TEMPLATE_ID
   },
   hosts: {
     acceptanceTests: process.env.ACCEPTANCE_HOST_NAME || `http://localhost:${process.env.PORT || 8080}`
@@ -18,8 +18,5 @@ module.exports = {
   redis: {
     port: process.env.REDIS_PORT || '6379',
     host: process.env.REDIS_HOST || '127.0.0.1'
-  },
-  sessionDefaults: {
-    steps: ['/feedback', '/feedback-sent']
   }
 };
