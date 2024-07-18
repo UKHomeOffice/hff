@@ -1,0 +1,13 @@
+.devcontainer
+.git
+node_modules
+coverage
+Dockerfile
+Dockerfile.local
+.DS_Store
+.gitignore
+README.md
+public
+.nycrc
+pull-request-template.md
+.env

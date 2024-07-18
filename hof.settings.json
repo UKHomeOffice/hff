@@ -1,0 +1,16 @@
+{
+  "appName": "HOF feedback form",
+  "theme": "govUK",
+  "behaviours": [
+    "hof/components/clear-session"
+  ],
+  "translations": "./apps/hff/translations",
+  "routes": [
+    "./apps/hff"
+  ],
+  "session": {
+    "name": "hff.hof.sid"
+  },
+  "getAccessibility": true,
+  "emailerFallback": true
+}
