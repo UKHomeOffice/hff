@@ -1,6 +1,13 @@
 {
   "feedback": {
     "title": "Your feedback – Home Office Forms",
-    "header": "Your feedback"
+    "header": "Your feedback",
+    "intro": "Leave feedback to help us improve this service. Your feedback is anonymous and we cannot reply to you."
+  },
+  "feedback-sent": {
+    "title": "Feedback sent - Home Office Forms",
+    "header": "Feedback sent",
+    "intro": "Thank you for your feedback.",
+    "link-text": "Return to the GOV.UK homepage"
   }
 }
