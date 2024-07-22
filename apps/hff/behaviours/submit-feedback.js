@@ -12,11 +12,11 @@ module.exports = superclass => class extends superclass {
     let satisfaction = req.form.values.satisfaction;
     if (satisfaction && typeof satisfaction === 'string') {
       satisfaction = prettyPrintSentence(satisfaction);
-    };
+    }
     const improvements = req.form.values.improvements;
 
     // redirect to /feedback-sent without further action if no feedback supplied in submission
-    if (!satisfaction && !improvements) return super.saveValues(req, res, next)
+    if (!satisfaction && !improvements) return super.saveValues(req, res, next);
 
     const serviceName = req.sessionModel.get('service-referrer-name');
     const serviceReturnUrl = req.sessionModel.get('service-referrer-url');
