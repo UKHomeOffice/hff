@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/UKHomeOffice/hff#readme",
   "dependencies": {
-    "hof": "^21.0.0",
+    "hof": "^21.0.1",
     "notifications-node-client": "^8.2.0"
   },
   "devDependencies": {
