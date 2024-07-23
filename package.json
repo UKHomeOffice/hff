@@ -44,7 +44,9 @@
       "!**/coverage/**",
       "!config.js",
       "!**/assets/js/*.js",
-      "!**/public/js/*.js"
+      "!**/public/js/*.js",
+      "!apps/**/fields/*.js",
+      "!apps/**/index.js"
     ]
   }
 }
