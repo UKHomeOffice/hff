@@ -43,7 +43,7 @@ describe('get-service-query behaviour', () => {
     });
 
     test('should be called', () => {
-      expect(Base.prototype.configure).toHaveBeenCalled()
+      expect(Base.prototype.configure).toHaveBeenCalled();
     });
 
     test('should add req.query values to the session under correct keys', () => {

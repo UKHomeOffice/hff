@@ -13,7 +13,7 @@ jest.mock('../../../config.js', () => {
   };
 });
 
-const NotifyClient = require('notifications-node-client').NotifyClient
+const NotifyClient = require('notifications-node-client').NotifyClient;
 
 describe('submit-feedback behaviour', () => {
   test('Behaviour exports a function', () => {
@@ -57,7 +57,7 @@ describe('submit-feedback behaviour', () => {
 
     test('saveValues should be called', async () => {
       await instance.saveValues(req, res, next);
-      expect(Base.prototype.saveValues).toHaveBeenCalled()
+      expect(Base.prototype.saveValues).toHaveBeenCalled();
     });
 
     test('Notify sendEmail should be called', async () => {
@@ -128,7 +128,7 @@ describe('submit-feedback behaviour', () => {
     });
 
     test('Notify errors are detected and passed to next()', async () => {
-      NotifyClient.prototype.sendEmail = jest.fn().mockRejectedValue(new Error('Notify error')),
+      NotifyClient.prototype.sendEmail = jest.fn().mockRejectedValue(new Error('Notify error'));
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail).toHaveBeenCalled();
       expect(next).toHaveBeenCalled;
