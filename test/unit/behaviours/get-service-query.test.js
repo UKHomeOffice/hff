@@ -96,5 +96,12 @@ describe('get-service-query behaviour', () => {
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
     });
+
+    test('returnUrl value overrides Referrer value in session if both are present', () => {
+      req.query.returnUrl = 'https://return-service.homeoffice.gov.uk'
+      req.get = jest.fn().mockReturnValue('https://referrer-service.homeoffice.gov.uk');
+      instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-url')).toBe('https://return-service.homeoffice.gov.uk');
+    });
   });
 });
