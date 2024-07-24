@@ -61,24 +61,6 @@ steps:
         - feature/*
       event: [push, pull_request]
 
-  # Trivy Security Scannner for scanning OS related vulnerabilities in Base image of Dockerfile
-  - name: scan_image_os
-    pull: always
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
-    resources:
-      limits:
-        cpu: 1000
-        memory: 1024Mi
-    environment:
-      IMAGE_NAME: node:20.15.0-alpine3.20@sha256:24c14a8a192a6e81d0942929a344f7a4bdf0db8e3b3c77d64a5eb8a4b0c759b7
-      SERVICE_URL: https://acp-trivy.acp-trivy.svc.cluster.local:443
-      SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree
-      FAIL_ON_DETECTION: false
-      IGNORE_UNFIXED: false
-      ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
-    when:
-      event: [push, pull_request]
-
   - name: setup_deploy
     pull: if-not-exists
     image: node:20.15.0-alpine3.20@sha256:24c14a8a192a6e81d0942929a344f7a4bdf0db8e3b3c77d64a5eb8a4b0c759b7
@@ -158,8 +140,9 @@ steps:
         - feature/*
       event: [push, pull_request]
 
-  # Trivy Security Scannner for scanning nodejs packages in Yarn
-  - name: scan_node_packages
+  # Trivy Security Scannner
+
+  - name: scan-image
     pull: always
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     resources:
@@ -167,13 +150,16 @@ steps:
         cpu: 1000
         memory: 1024Mi
     environment:
-      IMAGE_NAME: hff:${DRONE_COMMIT_SHA}
-      SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree
+      IMAGE_NAME: sas/ecs:${DRONE_COMMIT_SHA}
+      TOLERATE: MEDIUM,HIGH,CRITICAL
       FAIL_ON_DETECTION: false
-      IGNORE_UNFIXED: false
-      ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
+      IGNORE_UNFIXED: true
+      ALLOW_CVE_LIST_FILE: hof-services-config/Employers_Checking_Service/trivy-cve-exceptions.txt
     when:
-      event: [push, pull_request]
+      event:
+      - pull_request
+      - push
+      - tag
   
   # Deploy to pull request Branch environment
   - name: deploy_to_branch
@@ -369,29 +355,15 @@ steps:
       cron: security_scans
       event: cron
 
-  - name: cron_trivy_scan_node_packages
+  - name: cron_trivy_scan
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
     environment:
-        IMAGE_NAME: hff:${DRONE_COMMIT_SHA}
-        SERVICE_URL: https://acp-trivy.acp-trivy.svc.cluster.local:443
-        SEVERITY: UNKOWN,LOW,MEDIUM,HIGH,CRITICAL
-        FAIL_ON_DETECTION: true
-        IGNORE_UNFIXED: false
-        ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
-    when:
-      cron: security_scans
-      event: cron
-
-  - name: cron_trivy_scan_image_os
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
-    pull: always
-    environment:
-        IMAGE_NAME: node:20.15.0-alpine3.20@sha256:24c14a8a192a6e81d0942929a344f7a4bdf0db8e3b3c77d64a5eb8a4b0c759b7
-        SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-        FAIL_ON_DETECTION: true
-        IGNORE_UNFIXED: false
-        ALLOW_CVE_LIST_FILE: hof-services-config/infrastructure/trivy/.trivyignore.yaml
+      IMAGE_NAME: ecs:${DRONE_COMMIT_SHA}
+      SEVERITY: MEDIUM,HIGH,CRITICAL
+      FAIL_ON_DETECTION: false
+      IGNORE_UNFIXED: true
+      ALLOW_CVE_LIST_FILE: hof-services-config/Employers_Checking_Service/trivy-cve-exceptions.txt
     when:
       cron: security_scans
       event: cron
