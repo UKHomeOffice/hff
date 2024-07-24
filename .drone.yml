@@ -150,7 +150,7 @@ steps:
         cpu: 1000
         memory: 1024Mi
     environment:
-      IMAGE_NAME: sas/ecs:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: sas/hff:${DRONE_COMMIT_SHA}
       TOLERATE: MEDIUM,HIGH,CRITICAL
       FAIL_ON_DETECTION: false
       IGNORE_UNFIXED: true
@@ -359,7 +359,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
     environment:
-      IMAGE_NAME: ecs:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: hff:${DRONE_COMMIT_SHA}
       SEVERITY: MEDIUM,HIGH,CRITICAL
       FAIL_ON_DETECTION: false
       IGNORE_UNFIXED: true
