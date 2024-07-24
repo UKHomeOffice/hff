@@ -84,7 +84,20 @@ By following these steps, you should be able to install and run your application
 
 This application is containerised and ready for deployment on Kubernetes. Refer to the `kube/` directory for Kubernetes deployment scripts.
 
-## Query parameters
+## Linking to this feedback form from another HOF project
+
+In a HOF project the feedback banner and URL are enabled by adding it to res.locals via an `app.use` function in the server.js of that project e.g.
+
+```javascript
+app.use((req, res, next) => {
+  res.locals.feedbackUrl = 'https://hof-feedback.homeoffice.gov.uk';
+  next();
+});
+```
+
+The URL can also be added from a config file or environment variables. The `res.locals.feedbackUrl` can be added in this way alongside other local values such as `htmlLang`.
+
+### Query parameters
 
 When linking to this feedback form from other HOF forms you can add query context in the format e.g. `https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.google.com`.
 
@@ -98,5 +111,7 @@ All other parameters added to the query will be ignored.
 If a 'form' parameter is given it will include this as the service name the feedback is related to in the submission email. If you are linking from another HOF form to this feedback form you can include this parameter in the query so that feedback recipients can tell it is related to this service.
 
 If a 'returnUrl' parameter is given alongside a 'form' parameter then the feedback submission notification will include a link back to the form it is related to. Without an accompanying 'form' parameter the 'returnUrl' parameter will be ignored.
+
+The app will also look at the HTTP referrer for a properly formatted URL. If none is present this will be ignored. If a returnUrl is also present in the query it will override the referrer as the return link in the feedback notification email.
 
 Including these parameters in links to this form is optional, but may improve the context of the feedback if the user did not otherwise indicate which HOF form they were giving feedback for.
