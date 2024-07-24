@@ -99,7 +99,9 @@ The URL can also be added from a config file or environment variables. The `res.
 
 ### Query parameters
 
-When linking to this feedback form from other HOF forms you can add query context in the format e.g. `https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.google.com`.
+When linking to this feedback form from other HOF forms you can add query context in the format e.g. `https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.google.com`.
+
+> **_NOTE:_**  If you are providing query parameters for context you must add them to the `/feedback` route. You can access the feedback form via the root URL and it will redirect to `/feedback`, but it will not collect context from the query unless the `/feedback` route is targeted directly.
 
 The parameters that can be included are:
 
