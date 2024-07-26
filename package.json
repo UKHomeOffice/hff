@@ -4,7 +4,7 @@
   "description": "A feedback form for users of other HOF services to fill",
   "main": "index.js",
   "engines": {
-    "node": ">=20.15.0"
+    "node": ">=20.16.0"
   },
   "scripts": {
     "start": "node server.js",
@@ -47,6 +47,7 @@
       "!**/public/js/*.js",
       "!apps/**/fields/*.js",
       "!apps/**/index.js"
-    ]
+    ],
+    "setupFiles": ["dotenv/config"]
   }
 }
