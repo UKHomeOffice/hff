@@ -1,6 +1,21 @@
 const Behaviour = require('../../../apps/hff/behaviours/get-service-query');
 const reqres = require('hof').utils.reqres;
 
+let utils = require('../../../utils')
+jest.mock('../../../utils');
+
+// jest.mock('../../../config.js', () => {
+//   const originalModule = jest.requireActual('../../../config.js');
+//   return {
+//     ...originalModule,
+//     hmac: {
+//       queryKey: 'skeletonKey',
+//       algorithm: 'sha256',
+//       encoding: 'hex'
+//     }
+//   };
+// });
+
 describe('get-service-query behaviour', () => {
   test('Behaviour exports a function', () => {
     expect(typeof Behaviour).toBe('function');
@@ -23,6 +38,7 @@ describe('get-service-query behaviour', () => {
 
     GetServiceQuery = Behaviour(Base);
     instance = new GetServiceQuery;
+    process.env.QUERY_KEY = 'skeletonKey';
   });
 
 
@@ -32,12 +48,16 @@ describe('get-service-query behaviour', () => {
 
       req.query = {
         form: 'ASC',
-        returnUrl: 'https://www.fake-service.homeoffice.gov.uk'
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
+        mac: '686173686564616e6468657865640a'
       };
+
+      utils.createHmacDigest.mockReturnValue('686173686564616e6468657865640a');
     });
 
+
     afterEach(() => {
-      jest.restoreAllMocks();
+      jest.clearAllMocks();
     });
 
     test('should be called', () => {
@@ -45,63 +65,74 @@ describe('get-service-query behaviour', () => {
       expect(Base.prototype.configure).toHaveBeenCalled();
     });
 
-    test('should add req.query values to the session under correct keys', () => {
+    test('adds req.query values to the session under correct keys and values', () => {
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe('ASC');
       expect(req.sessionModel.get('service-referrer-url')).toBe('https://www.fake-service.homeoffice.gov.uk');
+      expect(utils.createHmacDigest).toHaveBeenCalledWith('sha256', 'skeletonKey', '', 'hex');
     });
 
-    test('should not add a service name query value to session if it does not match the proper format', () => {
-      req.query = {
-        form: 'ASC!',
-        returnUrl: 'https://www.fake-service.homeoffice.gov.uk'
-      };
+   test('does not add a service name query value to session if it does not match the proper format', () => {
+      req.query.form = 'ASC!',
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
     });
 
-    test('should not add a returnUrl query value to session if it does not match the proper format', () => {
+    test('does not add a returnUrl query value to session if it does not match the proper format', () => {
+      req.query.returnUrl = 'fake-service.homeoffice.gov.uk';
+      instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
+    });
+
+    test('does not add a returnUrl query value to session if form value wasn\'t present', () => {
+      req.query.form = undefined;
+      instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
+    });
+
+    test('does not set service-referrer-name and -url if no mac is added to query', () => {
       req.query = {
         form: 'ASC',
-        returnUrl: 'https://www.fake-service.attacker.com'
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
       };
       instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
+    });
+
+    test('does not set service-referrer-name and -url if the query mac does not have the same signature as a new hash', () => {
       req.query = {
         form: 'ASC',
-        returnUrl: 'fake-service.homeoffice.gov.uk'
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
+        mac: '786173686564616e6468657865640b'
       };
       instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
     });
 
-    test('Referrer value will be added to session if it matches the proper format', () => {
+    test('returns early and do not attempt to create digest or store values if no query.mac is found', () => {
       req.query = {
-        form: 'ASC'
+        form: 'ASC',
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
       };
-      req.get = jest.fn().mockReturnValue('https://fake-service.homeoffice.gov.uk');
-      // req.referrer = 'https://www.fake-service.homeoffice.gov.uk'
       instance.configure(req, res, next);
-      expect(req.sessionModel.get('service-referrer-url')).toBe('https://fake-service.homeoffice.gov.uk');
-    });
-
-    test('Referrer value won\'t be added to session if it does not match the proper format', () => {
-      req.query = {
-        form: 'ASC'
-      };
-      req.get = jest.fn().mockReturnValue('fake-service.homeoffice.gov.uk');
-      instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
-      req.get = jest.fn().mockReturnValue('https://www.fake-service.attacker.com');
-      instance.configure(req, res, next);
-      expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
-    });
-
-    test('returnUrl value overrides Referrer value in session if both are present', () => {
-      req.query.returnUrl = 'https://return-service.homeoffice.gov.uk';
-      req.get = jest.fn().mockReturnValue('https://referrer-service.homeoffice.gov.uk');
-      instance.configure(req, res, next);
-      expect(req.sessionModel.get('service-referrer-url')).toBe('https://return-service.homeoffice.gov.uk');
+      expect(utils.createHmacDigest).not.toHaveBeenCalled();
     });
   });
+
+  describe('...when no QUERY_KEY exists in environment', () => {
+    beforeAll(() => {
+      delete process.env.QUERY_KEY;
+    })
+
+    test('returns early and do not attempt to create digest or store values', () => {
+      instance.configure(req, res, next);
+      expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
+      expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
+      expect(utils.createHmacDigest).not.toHaveBeenCalled();
+    });
+  })
 });

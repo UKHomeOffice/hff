@@ -1,3 +1,5 @@
+const { createHmac } = require('node:crypto');
+
 // Print values from select options in ordinary sentence format.
 const prettyPrintSentence = string => {
   if (!string || typeof string !== 'string') {
@@ -5,4 +7,9 @@ const prettyPrintSentence = string => {
   } else return string.replaceAll('-', ' ').replace(/^./, string[0].toUpperCase());
 };
 
-module.exports = { prettyPrintSentence };
+// Create a HMAC digest from key and message
+const createHmacDigest = (algorithm, key, message, encoding) => {
+  return createHmac(algorithm, key).update(message).digest(encoding);
+};
+
+module.exports = { prettyPrintSentence, createHmacDigest };
