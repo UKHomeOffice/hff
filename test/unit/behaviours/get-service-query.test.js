@@ -1,20 +1,8 @@
 const Behaviour = require('../../../apps/hff/behaviours/get-service-query');
 const reqres = require('hof').utils.reqres;
 
-let utils = require('../../../utils')
+const utils = require('../../../utils');
 jest.mock('../../../utils');
-
-// jest.mock('../../../config.js', () => {
-//   const originalModule = jest.requireActual('../../../config.js');
-//   return {
-//     ...originalModule,
-//     hmac: {
-//       queryKey: 'skeletonKey',
-//       algorithm: 'sha256',
-//       encoding: 'hex'
-//     }
-//   };
-// });
 
 describe('get-service-query behaviour', () => {
   test('Behaviour exports a function', () => {
@@ -72,8 +60,8 @@ describe('get-service-query behaviour', () => {
       expect(utils.createHmacDigest).toHaveBeenCalledWith('sha256', 'skeletonKey', '', 'hex');
     });
 
-   test('does not add a service name query value to session if it does not match the proper format', () => {
-      req.query.form = 'ASC!',
+    test('does not add a service name query value to session if it does not match the proper format', () => {
+      req.query.form = 'ASC!';
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
     });
@@ -93,14 +81,14 @@ describe('get-service-query behaviour', () => {
     test('does not set service-referrer-name and -url if no mac is added to query', () => {
       req.query = {
         form: 'ASC',
-        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk'
       };
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
     });
 
-    test('does not set service-referrer-name and -url if the query mac does not have the same signature as a new hash', () => {
+    test('does not set service-referrer-name and -url if the query mac does not match a new hash', () => {
       req.query = {
         form: 'ASC',
         returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
@@ -114,7 +102,7 @@ describe('get-service-query behaviour', () => {
     test('returns early and do not attempt to create digest or store values if no query.mac is found', () => {
       req.query = {
         form: 'ASC',
-        returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
+        returnUrl: 'https://www.fake-service.homeoffice.gov.uk'
       };
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
@@ -126,7 +114,7 @@ describe('get-service-query behaviour', () => {
   describe('...when no QUERY_KEY exists in environment', () => {
     beforeAll(() => {
       delete process.env.QUERY_KEY;
-    })
+    });
 
     test('returns early and do not attempt to create digest or store values', () => {
       instance.configure(req, res, next);
@@ -134,5 +122,5 @@ describe('get-service-query behaviour', () => {
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
       expect(utils.createHmacDigest).not.toHaveBeenCalled();
     });
-  })
+  });
 });
