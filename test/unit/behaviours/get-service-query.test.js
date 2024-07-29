@@ -1,6 +1,5 @@
 const Behaviour = require('../../../apps/hff/behaviours/get-service-query');
 const reqres = require('hof').utils.reqres;
-
 const utils = require('../../../utils');
 jest.mock('../../../utils');
 
@@ -26,14 +25,12 @@ describe('get-service-query behaviour', () => {
 
     GetServiceQuery = Behaviour(Base);
     instance = new GetServiceQuery;
-    process.env.QUERY_KEY = 'skeletonKey';
+    Base.prototype.configure = jest.fn().mockReturnValue(req, res, next);
   });
 
 
   describe('The \'configure\' method', () => {
     beforeEach(() => {
-      Base.prototype.configure = jest.fn().mockReturnValue(req, res, next);
-
       req.query = {
         form: 'ASC',
         returnUrl: 'https://www.fake-service.homeoffice.gov.uk',
@@ -109,14 +106,28 @@ describe('get-service-query behaviour', () => {
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
       expect(utils.createHmacDigest).not.toHaveBeenCalled();
     });
+
+    test('still returns if an error that was detected in validation', () => {
+      utils.createHmacDigest.mockImplementation(() => {
+        throw new Error('Test error');
+      });
+      instance.configure(req, res, next);
+      expect(Base.prototype.configure).toHaveReturned();
+    });
   });
 
-  describe('...when no QUERY_KEY exists in environment', () => {
+  describe('When no QUERY_KEY exists in environment', () => {
+    const originalEnv = process.env;
+
     beforeAll(() => {
       delete process.env.QUERY_KEY;
     });
 
-    test('returns early and do not attempt to create digest or store values', () => {
+    afterAll(() => {
+      process.env = originalEnv;
+    });
+
+    test('returns early and does not attempt to create digest or store values', () => {
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
