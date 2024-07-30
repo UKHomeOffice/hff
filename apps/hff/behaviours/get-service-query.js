@@ -22,7 +22,7 @@ module.exports = superclass => class extends superclass {
         if (form && serviceReferrerNameRegex.test(form)) {
           req.sessionModel.set('service-referrer-name', form);
         } else {
-          logger.error(`Service name is undefined or formatting of ${form} is not valid`);
+          logger.info(`Service name is undefined or formatting of ${form} is not valid`);
         }
 
         if (returnUrl && URL.canParse(returnUrl)) {
@@ -30,7 +30,7 @@ module.exports = superclass => class extends superclass {
           const { origin } = serviceUrl;
           req.sessionModel.set('service-referrer-url', origin);
         } else {
-          logger.error(`Service URL is undefined or formatting of ${returnUrl} is not valid`);
+          logger.info(`Service URL is undefined or formatting of ${returnUrl} is not valid`);
         }
       } else {
         logger.error('given mac query parameter does not match new HMAC');
