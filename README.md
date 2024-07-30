@@ -141,9 +141,10 @@ The 'mac' parameter is generated as below from the querystring, a secret key and
 
 1. Acquire the secret key for your selected environment from Kubernetes secrets (or select your own if working locally)
 2. Take the original querystring including the '?': `?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
-3. Use your terminal to generate the hashed message from the command below (or using your own method)
-4. Append the generated HMAC as the 'mac' value in the complete querystring of your URL.
-5. Add the complete URL to your HOF project wherever you need a link to the feedback form.
+3. Ensure that any spaces in the 'form' parameter are URL encoded _before_ hashing to ensure a match. e.g. `my service` becomes `my%20service`
+4. Use your terminal to generate the hashed message from the command below (or using your own method)
+5. Append the generated HMAC as the 'mac' value in the complete querystring of your URL.
+6. Add the complete URL to your HOF project wherever you need a link to the feedback form.
 
 ```bash
 # command to run
