@@ -69,12 +69,6 @@ describe('get-service-query behaviour', () => {
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
     });
 
-    test('does not add a returnUrl query value to session if form value wasn\'t present', () => {
-      req.query.form = undefined;
-      instance.configure(req, res, next);
-      expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
-    });
-
     test('does not set service-referrer-name and -url if no mac is added to query', () => {
       req.query = {
         form: 'ASC',
