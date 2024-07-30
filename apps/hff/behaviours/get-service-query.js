@@ -15,7 +15,7 @@ module.exports = superclass => class extends superclass {
 
     try {
       const hashedAndHexed = createHmacDigest(algorithm, queryKey, queryString, encoding);
-      console.log('MATCH: ', mac === hashedAndHexed);
+
       if (mac === hashedAndHexed) {
         const { form, returnUrl } = req.query;
 
