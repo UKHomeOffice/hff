@@ -129,6 +129,8 @@ must become
 
 `https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk&mac=461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0`
 
+The 'mac' parameter is generated as below from the querystring, a secret key and some settings for hashing algorithm and output encoding.
+
 #### HMAC generation Prerequisites
 
 - The secret key to sign the MAC with.
@@ -137,12 +139,17 @@ must become
 
 #### HMAC generation steps
 
-1. Take the original querystring including the '?': `?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
-2. Use your terminal to generate the hashed message as below (or using your own method)
-3. Append the generated HMAC as the 'mac' value in the complete querystring of your URL.
-4. Add the complete URL to your HOF project wherever you need a link to the feedback form.
+1. Acquire the secret key for your selected environment from Kubernetes secrets (or select your own if working locally)
+2. Take the original querystring including the '?': `?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
+3. Use your terminal to generate the hashed message from the command below (or using your own method)
+4. Append the generated HMAC as the 'mac' value in the complete querystring of your URL.
+5. Add the complete URL to your HOF project wherever you need a link to the feedback form.
 
 ```bash
+# command to run
+echo -n "message to hash" | openssl dgst -sha256 -hmac "your secret key" -binary | xxd -p
+
+# example:
 echo -n "?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk" | openssl dgst -sha256 -hmac "skeletonKey" -binary | xxd -p
 # returns 461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0
 ```
