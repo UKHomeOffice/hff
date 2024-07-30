@@ -129,7 +129,7 @@ must become
 
 `https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk&mac=461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0`
 
-The 'mac' parameter is generated as below from the querystring, a secret key and some settings for hashing algorithm and output encoding.
+The 'mac' parameter is generated as below from the querystring, a secret key and some settings for hashing algorithm and output encoding. The defaults are SHA256 hashing and hex encoding.
 
 #### HMAC generation Prerequisites
 
