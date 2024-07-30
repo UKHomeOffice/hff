@@ -11,7 +11,7 @@ The HOF feedback form provides a place for users to submit feedback on their exp
 
 ## Getting Started
 
-- [Install & run locally](#install--run-the-application-locally)
+- [Install & run locally with Node.js](#install--run-the-application-locally-with-nodejs)
 - [Install & run locally with Docker Compose](#install--run-the-application-locally-with-docker-compose)
 
 ### Dependencies

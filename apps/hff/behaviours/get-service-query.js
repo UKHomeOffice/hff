@@ -19,18 +19,18 @@ module.exports = superclass => class extends superclass {
       if (mac === hashedAndHexed) {
         const { form, returnUrl } = req.query;
 
-        if (serviceReferrerNameRegex.test(form)) {
+        if (form && serviceReferrerNameRegex.test(form)) {
           req.sessionModel.set('service-referrer-name', form);
         } else {
-          logger.error(`Service name formatting of ${form} is not valid`);
+          logger.error(`Service name is undefined or formatting of ${form} is not valid`);
         }
 
-        if (URL.canParse(returnUrl) && form) {
+        if (returnUrl && URL.canParse(returnUrl)) {
           const serviceUrl = new URL(returnUrl);
           const { origin } = serviceUrl;
           req.sessionModel.set('service-referrer-url', origin);
         } else {
-          logger.error(`Service URL formatting of ${returnUrl} is not valid`);
+          logger.error(`Service URL is undefined or formatting of ${returnUrl} is not valid`);
         }
       } else {
         logger.error('given mac query parameter does not match new HMAC');
