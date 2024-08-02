@@ -1,26 +1,24 @@
-const { prettyPrintSentence, createHmacDigest } = require('../../utils');
+const { getLabel, createHmacDigest } = require('../../utils');
 
-describe('Utilities \'prettyPrintSentence\' ', () => {
-  test('replaces all hyphens in a string with spaces', () => {
-    const processedString = prettyPrintSentence('test-string-value');
-    expect(processedString).toBe('Test string value');
-    expect(processedString).not.toContain('-');
+describe('Utilities \'getLabel\' ', () => {
+  test('replaces the correct label from value for \'satisfaction\' field', () => {
+    expect(getLabel('satisfaction', 'very-satisfied')).toBe('Very satisfied');
+    expect(getLabel('satisfaction', 'satisfied')).toBe('Satisfied');
+    expect(getLabel('satisfaction', 'neither-satisfied-or-dissatisfied')).toBe('Neither satisfied or dissatisfied');
+    expect(getLabel('satisfaction', 'dissatisfied')).toBe('Dissatisfied');
+    expect(getLabel('satisfaction', 'very-dissatisfied')).toBe('Very dissatisfied');
   });
 
-  test('replaces the first letter of a string with its uppercase version', () => {
-    let processedString = prettyPrintSentence('test-string-value');
-    expect(processedString).toBe('Test string value');
-    expect(processedString[0]).toBe('T');
-    processedString = prettyPrintSentence('14565');
-    expect(processedString[0]).toBe('1');
+  test('returns undefined when an unexpected fieldKey parameter is passed', () => {
+    expect(getLabel('cheese', 'very-satisfied')).toBe(undefined);
+    expect(getLabel(null, 'very-satisfied')).toBe(undefined);
+    expect(getLabel(undefined, 'very-satisfied')).toBe(undefined);
   });
 
-  test('handles unexpected values by throwing an error', () => {
-    expect(() => prettyPrintSentence('')).toThrow(new Error('Cannot pretty print a non string parameter'));
-    expect(() => prettyPrintSentence(null)).toThrow(new Error('Cannot pretty print a non string parameter'));
-    expect(() => prettyPrintSentence(undefined)).toThrow(new Error('Cannot pretty print a non string parameter'));
-    expect(() => prettyPrintSentence(12345)).toThrow(new Error('Cannot pretty print a non string parameter'));
-    expect(() => prettyPrintSentence()).toThrow(new Error('Cannot pretty print a non string parameter'));
+  test('returns undefined when an unexpected fieldValue parameter is passed', () => {
+    expect(getLabel('satisfaction', 'very-cheese')).toBe(undefined);
+    expect(getLabel('satisfaction', null)).toBe(undefined);
+    expect(getLabel('satisfaction', undefined)).toBe(undefined);
   });
 });
 

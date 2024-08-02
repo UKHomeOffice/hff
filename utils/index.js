@@ -1,24 +1,29 @@
 const { createHmac } = require('node:crypto');
+const translations = require('../apps/hff/translations/src/en/fields.json');
 
-// Print values from select options in ordinary sentence format.
-const prettyPrintSentence = string => {
-  if (!string || typeof string !== 'string') {
-    throw new Error('Cannot pretty print a non string parameter');
-  } else return string.replaceAll('-', ' ').replace(/^./, string[0].toUpperCase());
+const getLabel = (fieldKey, fieldValue) => {
+  return translations[fieldKey]?.options[fieldValue]?.label;
 };
 
 // Create a HMAC digest from key and message
 const createHmacDigest = (algorithm, key, message, encoding) => {
   if (!algorithm) {
     throw new Error('You must provide a hashing algorithm e.g. \'sha256\'');
-  } else if (!key) {
+  }
+
+  if (!key) {
     throw new Error('You must provide a HMAC key');
-  } else if (!message) {
+  }
+
+  if (!message) {
     throw new Error('You must provide a message to hash');
-  } else if (!encoding) {
+  }
+
+  if (!encoding) {
     throw new Error('You must provide an output encoding e.g. \'hex\'');
   }
+
   return createHmac(algorithm, key).update(message).digest(encoding);
 };
 
-module.exports = { prettyPrintSentence, createHmacDigest };
+module.exports = { getLabel, createHmacDigest };
