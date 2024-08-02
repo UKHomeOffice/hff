@@ -86,16 +86,9 @@ This application is containerised and ready for deployment on Kubernetes. Refer 
 
 ## Linking to this feedback form from another HOF project
 
-In a HOF project the feedback banner and URL are enabled by adding it to res.locals via an `app.use` function in the server.js of that project e.g.
+In a HOF project the feedback banner and URL are enabled by adding it as `res.locals.feedbackUrl` via an `app.use` function in the `server.js` of that project.
 
-```javascript
-app.use((req, res, next) => {
-  res.locals.feedbackUrl = 'https://hof-feedback.homeoffice.gov.uk';
-  next();
-});
-```
-
-The URL can also be added from a config file or environment variables. The `res.locals.feedbackUrl` can be added in this way alongside other local values such as `htmlLang`.
+It is preferred to declare the feedback form URL value in the root level `config.js` in your project then import the value for use in `server.js`. See existing implementations for a working example.
 
 ### Query parameters
 
