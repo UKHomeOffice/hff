@@ -13,6 +13,9 @@ jest.mock('../../../config.js', () => {
   };
 });
 
+const utils = require('../../../utils');
+jest.mock('../../../utils');
+
 const NotifyClient = require('notifications-node-client').NotifyClient;
 
 describe('submit-feedback behaviour', () => {
@@ -49,6 +52,8 @@ describe('submit-feedback behaviour', () => {
         satisfaction: 'very-satisfied',
         improvements: 'A list of improvements...'
       };
+
+      utils.getLabel.mockReturnValue('Very satisfied');
     });
 
     afterEach(() => {
@@ -86,6 +91,21 @@ describe('submit-feedback behaviour', () => {
         service_name: 'ASC',
         service_link: '[ASC](https://...)',
         satisfaction: 'Very satisfied',
+        improvements: 'A list of improvements...'
+      };
+      await instance.saveValues(req, res, next);
+      expect(NotifyClient.prototype.sendEmail)
+        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+    });
+
+    test('if getLabel function returns undefined a backup value is assigned to session', async () => {
+      utils.getLabel.mockReturnValue(undefined);
+
+      emailProps = {
+        service_given: 'no',
+        service_name: '',
+        service_link: '',
+        satisfaction: 'very-satisfied',
         improvements: 'A list of improvements...'
       };
       await instance.saveValues(req, res, next);

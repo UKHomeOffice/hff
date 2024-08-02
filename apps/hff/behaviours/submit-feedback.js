@@ -2,16 +2,17 @@ const config = require('../../../config');
 const logger = require('hof/lib/logger')({ env: config.env });
 const { notifyApiKey, feedbackInbox, feedbackSubmissionTemplateId } = config.govukNotify;
 
-const { prettyPrintSentence } = require('../../../utils');
+const { getLabel } = require('../../../utils');
 
 const NotifyClient = require('notifications-node-client').NotifyClient;
 const Notify = new NotifyClient(notifyApiKey);
 
 module.exports = superclass => class extends superclass {
   async saveValues(req, res, next) {
-    let satisfaction = req.form.values.satisfaction;
-    if (satisfaction && typeof satisfaction === 'string') {
-      satisfaction = prettyPrintSentence(satisfaction);
+    const satisfactionValue = req.form.values.satisfaction;
+    let satisfaction;
+    if (satisfactionValue && typeof satisfactionValue === 'string') {
+      satisfaction = getLabel('satisfaction', satisfactionValue) ?? satisfactionValue;
     }
     const improvements = req.form.values.improvements;
 
@@ -34,7 +35,11 @@ module.exports = superclass => class extends superclass {
       await Notify.sendEmail(feedbackSubmissionTemplateId, feedbackInbox, { personalisation: emailProps });
       logger.info(`Feedback sent successfully for: ${serviceName ?? 'service/form name not given'}`);
     } catch (error) {
-      logger.error('Failed to send feedback email:', error);
+      const errorDetails = error.response?.data ? `Cause: ${JSON.stringify(error.response.data)}` : '';
+      const errorCode = error.code ? `${error.code} -` : '';
+      const errorMessage = `${errorCode} ${error.message}; ${errorDetails}`;
+
+      logger.error(`Failed to send feedback email: ${errorMessage}`);
       return next(error);
     }
 
