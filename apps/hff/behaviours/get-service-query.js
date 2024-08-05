@@ -9,28 +9,39 @@ module.exports = superclass => class extends superclass {
       return super.configure(req, res, next);
     }
 
-    const { mac } = req.query;
-    const sentUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
-    const queryString = sentUrl.search?.split('&mac=')[0];
+    const { form, returnUrl, mac } = req.query;
 
     try {
-      const hashedAndHexed = createHmacDigest(algorithm, queryKey, queryString, encoding);
+      const comparisonObject = {};
+
+      if (form) {
+        comparisonObject.form = decodeURIComponent(form);
+      }
+
+      if (returnUrl) {
+        comparisonObject.returnUrl = decodeURIComponent(returnUrl);
+      }
+
+      const comparisonString = JSON.stringify(comparisonObject);
+
+      const hashedAndHexed = createHmacDigest(algorithm, queryKey, comparisonString, encoding);
 
       if (mac === hashedAndHexed) {
-        const { form, returnUrl } = req.query;
+        const decodedForm = comparisonObject.form;
+        const decodedReturnUrl = comparisonObject.returnUrl;
 
-        if (form && serviceReferrerNameRegex.test(form)) {
-          req.sessionModel.set('service-referrer-name', form);
+        if (decodedForm && serviceReferrerNameRegex.test(decodedForm)) {
+          req.sessionModel.set('service-referrer-name', decodedForm);
         } else {
-          logger.info(`Service name is undefined or formatting of ${form} is not valid`);
+          logger.info(`Service name is undefined or formatting of ${decodedForm} is not valid`);
         }
 
-        if (returnUrl && URL.canParse(returnUrl)) {
-          const serviceUrl = new URL(returnUrl);
+        if (decodedReturnUrl && URL.canParse(decodedReturnUrl)) {
+          const serviceUrl = new URL(decodedReturnUrl);
           const { origin } = serviceUrl;
           req.sessionModel.set('service-referrer-url', origin);
         } else {
-          logger.info(`Service URL is undefined or formatting of ${returnUrl} is not valid`);
+          logger.info(`Service URL is undefined or formatting of ${decodedReturnUrl} is not valid`);
         }
       } else {
         logger.error('given mac query parameter does not match new HMAC');
@@ -38,7 +49,7 @@ module.exports = superclass => class extends superclass {
     } catch (error) {
       logger.error('There was a problem matching query to validation requirements', error);
     }
-
+    logger.info('HMAC matched OK');
     return super.configure(req, res, next);
   }
 };
