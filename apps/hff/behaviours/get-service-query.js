@@ -24,7 +24,7 @@ module.exports = superclass => class extends superclass {
 
       const comparisonString = JSON.stringify(comparisonObject);
 
-      const hashedAndHexed = createHmacDigest(null, queryKey, comparisonString, encoding);
+      const hashedAndHexed = createHmacDigest(algorithm, queryKey, comparisonString, encoding);
 
       if (mac === hashedAndHexed) {
         logger.info('HMAC matched OK');
