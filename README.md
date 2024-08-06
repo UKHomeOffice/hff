@@ -18,7 +18,6 @@ The HOF feedback form provides a place for users to submit feedback on their exp
 
 - This form is built using the [HOF framework](https://github.com/UKHomeOfficeForms/hof)
 - [Gov.uk Notify](https://www.notifications.service.gov.uk) to send notification emails
-- [File Vault](https://github.com/UKHomeOffice/file-vault) to store and retrieve uploaded files
 
 ### Environment variables
 
@@ -88,62 +87,84 @@ This application is containerised and ready for deployment on Kubernetes. Refer 
 
 In a HOF project the feedback banner and URL are enabled by adding it as `res.locals.feedbackUrl` via an `app.use` function in the `server.js` of that project.
 
-It is preferred to declare the feedback form URL value in the root level `config.js` in your project then import the value for use in `server.js`. See existing implementations for a working example.
+Add some `feedback` values to your `config.js`:
+
+```javascript
+{
+  feedback: {
+    url: 'https://hof-feedback.homeoffice.gov.uk', // required if you want a feedback banner and link to feedback form
+    form: encodeURIComponent('your form name or alias'), // optional if you want to include this context
+    returnUrl: 'https://www.your-form-url.homeoffice.gov.uk', // optional if you want a return URL to your form in the feedback email
+    mac: 'pre-hashed mac of the above two params in a JSON object string' // required if you add one or both of form and returnUrl
+  }
+}
+```
+
+Assign the following to `res.locals.feedbackUrl`. See [below](#query-parameters) for information about use of query parameter context.
+
+```javascript
+const { url, form, returnUrl, mac } = require('config.js').feedback;
+res.locals.feedbackUrl = `${url}?form=${form}&returnUrl=${returnUrl}&mac=${mac}`
+```
+
+Add and remove the query values from the above assignation as required.
+
+You can simply assign `config.feedback.url` to `res.locals.feedbackUrl` if you have no need to supply additional query context.
 
 ### Query parameters
 
-When linking to this feedback form from other HOF forms you can add query context in the format e.g. `https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.google.com&mac=GENERATED_MAC`.
+When linking to this feedback form from other HOF forms you can add query context.
 
-> **_NOTE:_**  If you are providing query parameters for context you must add them to the `/feedback` route. You can access the feedback form via the root URL and it will redirect to `/feedback`, but it will not collect context from the query unless the `/feedback` route is targeted directly.
-
-The parameters that can be included are:
+The parameters that are accepted by this feedback form are:
 
 - `form`: Must be alphanumeric but can include `' '` (space), `_` or `-`
-- `returnUrl`: Must have a full URL format that will parse with the Javascript URL object e.g. `https://service.homeoffice.gov.uk` or `https://www.service.homeoffice.gov.uk`
-- `mac`: A HMAC signature of the rest of the query string. This is required for the app to trust query parameters and add context to feedback notifications. Please see below for instructions on generating a HMAC to add to your querystring.
+- `returnUrl`: Must have a full URL format that will parse with the JavaScript URL object e.g. `https://service.homeoffice.gov.uk` or `https://www.service.homeoffice.gov.uk`
+- `mac`: A HMAC signature of a JSON string containing the above two data. This is required for the app to trust query parameters and add context to feedback notifications. Please see below for instructions on generating a HMAC to add to your querystring.
 
 All other parameters added to the query will be ignored.
 
-If a 'form' parameter is given it will include this as the service name the feedback is related to in the submission email. If you are linking from another HOF form to this feedback form you can include this parameter in the query so that feedback recipients can tell it is related to your service.
+If a 'form' parameter is given it be included as the service name the feedback is related to in the submission email. If you are linking from another HOF form to this feedback form you can include this parameter in the query so that feedback recipients can tell it is related to your service.
 
-If a 'returnUrl' parameter is given alongside a 'form' parameter then the feedback submission notification will include a link back to the form it is related to. Without an accompanying 'form' parameter the 'returnUrl' parameter will be ignored.
+If a 'returnUrl' parameter is given alongside a 'form' parameter then the feedback submission email will include a link back to the form it is related to. Without an accompanying 'form' parameter the 'returnUrl' parameter will be ignored.
 
 If no 'mac' parameter is given alongside other query data then the app will ignore the query altogether. The HMAC verifies that the query is sent from a trusted source.
 
 Including these parameters in links to this form is optional, but may improve the context of the feedback if the user did not otherwise indicate which HOF form they were giving feedback for. A user can still link to and submit a feedback form without the query element, but some useful context may be missing from their answers.
 
-### Creating a MAC for your querystring
+### Creating a MAC for your URL query
 
-To have your querystring trusted by this application it will need to be signed by a HMAC that is then appended to the querystring as 'mac'. e.g.
+To have your query parameters trusted by this application it will need to be signed by a HMAC that is then appended to the querystring as 'mac'. e.g.
 
-`https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
+`https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
 
 must become
 
-`https://hof-feedback.homeoffice.gov.uk/feedback?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk&mac=461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0`
+`https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk&mac=461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0`
 
-The 'mac' parameter is generated as below from the querystring, a secret key and some settings for hashing algorithm and output encoding. The defaults are SHA256 hashing and hex encoding.
+The 'mac' parameter is generated as below from a hash of a JSON object string, a secret key and some settings for hashing algorithm and output encoding. The defaults are SHA256 hashing and hex encoding.
 
 #### HMAC generation Prerequisites
 
 - The secret key to sign the MAC with.
-- Local binaries `openssl` and `xxd`
-- ...or any other method of generating a HMAC from a message and key with SHA256 algorithm and hex encoded output.
+- A JavaScript object structure containing the `form` and `returnUrl` values you want to include as context in the link
+- Node.js - ideally use the same version running in this app.
 
 #### HMAC generation steps
 
-1. Acquire the secret key for your selected environment from Kubernetes secrets (or select your own if working locally)
-2. Take the original querystring including the '?': `?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
-3. Ensure that any spaces in the 'form' parameter are URL encoded _before_ hashing to ensure a match. e.g. `my service` becomes `my%20service`
-4. Use your terminal to generate the hashed message from the command below (or using your own method)
-5. Append the generated HMAC as the 'mac' value in the complete querystring of your URL.
-6. Add the complete URL to your HOF project wherever you need a link to the feedback form.
+Acquire the secret key (`QUERY_KEY`) for your selected environment from Kubernetes secrets (or select your own if working locally).
 
-```bash
-# command to run
-echo -n "message to hash" | openssl dgst -sha256 -hmac "your secret key" -binary | xxd -p
+To generate the HMAC using Node.js, you can use the following command. Make sure to replace the placeholders `<your actual secret key>` and `<your object>` with your actual secret key and the object you want to hash, respectively:
 
-# example:
-echo -n "?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk" | openssl dgst -sha256 -hmac "skeletonKey" -binary | xxd -p
-# returns 461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0
+```javascript
+node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = '<your actual secret key>'; const message = JSON.stringify(<your object>); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log(hmac);"
 ```
+
+example:
+
+```javascript
+node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = 'supersecretkey'; const message = JSON.stringify({form: 'My HO Form', returnUrl: 'https://www.my-ho-form.homeoffice.gov.uk'}); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log(hmac);"
+```
+
+_Please ensure that the object keys/params are in the order as given in the example above._
+
+This will output the HMAC for the given message, which you can then append to your URL as the mac parameter.
