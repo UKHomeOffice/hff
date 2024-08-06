@@ -57,7 +57,7 @@ describe('get-service-query behaviour', () => {
       expect(utils.createHmacDigest).toHaveBeenCalledWith(
         'sha256',
         'skeletonKey',
-        JSON.stringify({ 'form': req.query.form, returnUrl: req.query.returnUrl }),
+        JSON.stringify({ form: req.query.form, returnUrl: req.query.returnUrl }),
         'hex'
       );
     });
@@ -119,7 +119,7 @@ describe('get-service-query behaviour', () => {
       };
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
-    })
+    });
 
     test('still returns if an error that was detected in validation', () => {
       utils.createHmacDigest.mockImplementation(() => {

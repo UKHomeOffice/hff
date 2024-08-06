@@ -6,10 +6,11 @@ module.exports = {
   name: 'hff',
   baseUrl: '/',
   steps: {
-    '/feedback': {
+    '/': {
       fields: ['satisfaction', 'improvements'],
       behaviours: [getServiceQuery, submitFeedback],
-      next: '/feedback-sent'
+      next: '/feedback-sent',
+      template: 'feedback'
     },
     '/feedback-sent': {
       clearSession: true,
