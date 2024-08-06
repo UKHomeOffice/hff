@@ -1,5 +1,26 @@
 {
-  "feedback": {
-    "label": "Feedback"
+  "satisfaction": {
+    "legend": "How satisfied were you with the online service that you used? (Optional)",
+    "options": {
+      "very-satisfied": {
+        "label": "Very satisfied"
+      },
+      "satisfied": {
+        "label": "Satisfied"
+      },
+      "neither-satisfied-or-dissatisfied": {
+        "label": "Neither satisfied or dissatisfied"
+      },
+      "dissatisfied": {
+        "label": "Dissatisfied"
+      },
+      "very-dissatisfied": {
+        "label": "Very dissatisfied"
+      }
+    }
+  },
+  "improvements": {
+    "label": "How could we improve this form? (Optional)",
+    "hint": "Do not include any personal information, for example your name or telephone number."
   }
 }

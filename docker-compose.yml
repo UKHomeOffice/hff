@@ -13,6 +13,7 @@ services:
     volumes:
       - ./assets:/app/assets
       - ./apps:/app/apps
+      - ./utils:/app/utils
     restart: on-failure
 
   redis:
