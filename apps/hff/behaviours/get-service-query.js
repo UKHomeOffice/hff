@@ -24,9 +24,10 @@ module.exports = superclass => class extends superclass {
 
       const comparisonString = JSON.stringify(comparisonObject);
 
-      const hashedAndHexed = createHmacDigest(algorithm, queryKey, comparisonString, encoding);
+      const hashedAndHexed = createHmacDigest(null, queryKey, comparisonString, encoding);
 
       if (mac === hashedAndHexed) {
+        logger.info('HMAC matched OK');
         const decodedForm = comparisonObject.form;
         const decodedReturnUrl = comparisonObject.returnUrl;
 
@@ -49,7 +50,6 @@ module.exports = superclass => class extends superclass {
     } catch (error) {
       logger.error('There was a problem matching query to validation requirements', error);
     }
-    logger.info('HMAC matched OK');
     return super.configure(req, res, next);
   }
 };
