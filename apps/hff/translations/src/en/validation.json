@@ -1,1 +1,7 @@
-{}
+{
+  "improvements": {
+      "maxlength": "Improvements to form must be less than 10,000 characters",
+      "notUrl": "Do not enter a link/url into your answers",
+      "regex": "Improvements must not include these characters: [ ] < > / |"
+  }
+}
