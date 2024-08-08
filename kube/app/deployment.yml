@@ -80,8 +80,8 @@ spec:
             - name: QUERY_KEY
               valueFrom:
                 secretKeyRef:
-                  name: query_key
-                  key: query_key
+                  name: query-key
+                  key: query-key
             - name: USE_MOCKS
               value: "false"
           {{ if not (eq .KUBE_NAMESPACE .BRANCH_ENV) }}
