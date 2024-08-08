@@ -24,7 +24,7 @@ The HOF feedback form provides a place for users to submit feedback on their exp
 ```bash
 NODE_ENV=development
 REDIS_HOST='The hostname of the redis instance you want to use. e.g. hof-redis or 127.0.0.1'
-NOTIFY_KEY='The API key for the development Notify project'
+NOTIFY_KEY='The API key for the development Notify project.'
 FEEDBACK_INBOX='The inbox to send completed feedback to'
 FEEDBACK_TEMPLATE_ID='The Notify template ID for the feedback email template.'
 QUERY_KEY='A secret key used to verify HMAC signatures for queries sent to this form via URL'
