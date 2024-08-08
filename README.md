@@ -111,7 +111,7 @@ Add and remove the query values from the above assignation as required.
 
 You can simply assign `config.feedback.url` to `res.locals.feedbackUrl` if you have no need to supply additional query context.
 
-### Query parameters
+### Query parameters.
 
 When linking to this feedback form from other HOF forms you can add query context.
 
