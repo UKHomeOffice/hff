@@ -13,6 +13,8 @@ The HOF feedback form provides a place for users to submit feedback on their exp
 
 - [Install & run locally with Node.js](#install--run-the-application-locally-with-nodejs)
 - [Install & run locally with Docker Compose](#install--run-the-application-locally-with-docker-compose)
+- [Linking to this feedback form from another HOF project](#linking-to-this-feedback-form-from-another-hof-project)
+- [Generating HMAC and Constructing URL](#generating-hmac-and-constructing-url)
 
 ### Dependencies
 
@@ -133,38 +135,47 @@ Including these parameters in links to this form is optional, but may improve th
 
 ### Creating a MAC for your URL query
 
-To have your query parameters trusted by this application it will need to be signed by a HMAC that is then appended to the querystring as 'mac'. e.g.
+To have your query parameters trusted by this application, the `form` and `returnUrl` parameters need to be Base64 encoded. Additionally, the query parameters must be signed by an HMAC that is then appended to the query string as 'mac'. e.g.
 
-`https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk`
+```bash
+https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk
+```
 
 must become
 
-`https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk&mac=461d6959f3f14744c3dc72293545013317da289011c79de1ba18d37917a104d0`
+```bash
+https://hof-feedback.homeoffice.gov.uk?form=QVND&returnUrl=aHR0cHM6Ly93d3cuYXNjLmhvbWVvZmZpY2UuZ292LnVr&mac=a9c42638a509cfa379e6bc2050e4ecea67b0b30f6706858772a13a5292951a66
+```
 
 The 'mac' parameter is generated as below from a hash of a JSON object string, a secret key and some settings for hashing algorithm and output encoding. The defaults are SHA256 hashing and hex encoding.
 
 #### HMAC generation Prerequisites
 
 - The secret key to sign the MAC with.
-- A JavaScript object structure containing the `form` and `returnUrl` values you want to include as context in the link
+- A JavaScript object structure containing the Base64 encoded `form` and `returnUrl` values you want to include as context in the link
 - Node.js - ideally use the same version running in this app.
 
-#### HMAC generation steps
+#### Generating HMAC and Constructing URL
 
 Acquire the secret key (`QUERY_KEY`) for your selected environment from Kubernetes secrets (or select your own if working locally).
 
-To generate the HMAC using Node.js, you can use the following command. Make sure to replace the placeholders `<your actual secret key>` and `<your object>` with your actual secret key and the object you want to hash, respectively:
+To generate the link with HMAC using Node.js, you can use the following command. Make sure to replace the placeholders `<SECRET KEY>`, `<FORM>` and `<RETURN URL>` with your actual secret key, form and returnUrl you want to hash, respectively:
 
 ```javascript
-node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = '<your actual secret key>'; const message = JSON.stringify(<your object>); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log(hmac);"
-```
-
-example:
-
-```javascript
-node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = 'supersecretkey'; const message = JSON.stringify({form: 'My HO Form', returnUrl: 'https://www.my-ho-form.homeoffice.gov.uk'}); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log(hmac);"
+node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = '<SECRET KEY>'; const refObject = {form: btoa('<FORM>'), returnUrl: btoa('<RETURN URL>')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
 ```
 
 _Please ensure that the object keys/params are in the order as given in the example above._
 
-This will output the HMAC for the given message, which you can then append to your URL as the mac parameter.
+This will output a ready-to-use link with the HMAC for the given message, which you can then use as the feedback URL for your form.
+
+Example:
+
+```bash
+node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = 'skeletonKey'; const refObject = {form: btoa('ASC'), returnUrl: btoa('https://www.asc.homeoffice.gov.uk')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
+```
+Expected output:
+
+```bash
+https://hof-feedback.homeoffice.gov.uk?form=TXkgSE8gRm9ybQ==&returnUrl=aHR0cHM6Ly93d3cubXktaG8tZm9ybS5ob21lb2ZmaWNlLmdvdi51aw==&mac=1a43ba473a484513462fc892223b4bdf280d0ee3050c8dc088d57fcbcef1bf95
+```
