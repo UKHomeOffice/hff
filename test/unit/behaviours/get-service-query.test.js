@@ -32,8 +32,10 @@ describe('get-service-query behaviour', () => {
   describe('The \'configure\' method', () => {
     beforeEach(() => {
       req.query = {
-        form: 'QVND', // 'ASC' in base64
-        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr', // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        // 'ASC' in base64
+        form: 'QVND',
+        // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr',
         mac: '5045060455395a109a61689ee2f5d989e3df3dc24e1768e00853b34b800df148'
       };
 
@@ -63,27 +65,32 @@ describe('get-service-query behaviour', () => {
     });
 
     test('form value will be URI decoded before comparison and storage', () => {
-      req.query.form = 'bmV3IGZvcm0='; // 'new form' in base64
+      // 'new form' in base64
+      req.query.form = 'bmV3IGZvcm0=';
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe('new form');
     });
 
     test('does not add a service name query value to session if it does not match the proper format', () => {
-      req.query.form = 'QVNDIQ=='; // 'ASC!' in base64
+      // 'ASC!' in base64
+      req.query.form = 'QVNDIQ==';
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
     });
 
     test('does not add a returnUrl query value to session if it does not match the proper format', () => {
-      req.query.returnUrl = 'ZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr'; // 'fake-service.homeoffice.gov.uk' in base64
+      // 'fake-service.homeoffice.gov.uk' in base64
+      req.query.returnUrl = 'ZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr';
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-url')).toBe(undefined);
     });
 
     test('does not set service-referrer-name and -url if no mac is added to query', () => {
       req.query = {
-        form: 'QVNDIQ==', // 'ASC!' in base64
-        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr' // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        // 'ASC!' in base64
+        form: 'QVNDIQ==',
+        // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr'
       };
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
@@ -92,8 +99,10 @@ describe('get-service-query behaviour', () => {
 
     test('does not set service-referrer-name and -url if the query mac does not match a new hash', () => {
       req.query = {
-        form: 'QVNDIQ==', // 'ASC!' in base64
-        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr', // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        // 'ASC!' in base64
+        form: 'QVNDIQ==',
+        // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr',
         mac: '786173686564616e6468657865640b'
       };
       instance.configure(req, res, next);
@@ -114,8 +123,10 @@ describe('get-service-query behaviour', () => {
 
     test('does not assign a form value if it is not URI decodable', () => {
       req.query = {
-        form: 'QVNDJSE=', // 'ASC%!' in base64
-        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr' // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        // 'ASC%!' in base64
+        form: 'QVNDJSE=',
+        // 'https://www.fake-service.homeoffice.gov.uk' in base64
+        returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr'
       };
       instance.configure(req, res, next);
       expect(req.sessionModel.get('service-referrer-name')).toBe(undefined);
