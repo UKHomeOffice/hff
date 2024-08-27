@@ -162,7 +162,7 @@ Acquire the secret key (`QUERY_KEY`) for your selected environment from Kubernet
 To generate the link with HMAC using Node.js, you can use the following command. Make sure to replace the placeholders `<SECRET KEY>`, `<FORM>` and `<RETURN URL>` with your actual secret key, form and returnUrl you want to hash, respectively:
 
 ```javascript
-node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = '<SECRET KEY>'; const refObject = {form: btoa('<FORM>'), returnUrl: btoa('<RETURN URL>')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
+node -e "const { createHmac } = require('node:crypto'); const { Buffer } = require('node:buffer'); const algorithm = 'sha256'; const key = '<SECRET KEY>'; const refObject = {form: Buffer.from('<FORM>', 'utf8').toString('base64'), returnUrl: Buffer.from('<RETURN URL>', 'utf8').toString('base64')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
 ```
 
 _Please ensure that the object keys/params are in the order as given in the example above._
@@ -172,7 +172,7 @@ This will output a ready-to-use link with the HMAC for the given message, which 
 Example:
 
 ```bash
-node -e "const { createHmac } = require('node:crypto'); const algorithm = 'sha256'; const key = 'skeletonKey'; const refObject = {form: btoa('ASC'), returnUrl: btoa('https://www.asc.homeoffice.gov.uk')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
+node -e "const { createHmac } = require('node:crypto'); const { Buffer } = require('node:buffer'); const algorithm = 'sha256'; const key = 'skeletonKey'; const refObject = {form: Buffer.from('ASC', 'utf8').toString('base64'), returnUrl: Buffer.from('https://www.asc.homeoffice.gov.uk', 'utf8').toString('base64')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
 ```
 Expected output:
 

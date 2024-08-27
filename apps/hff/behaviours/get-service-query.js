@@ -3,7 +3,7 @@ const serviceReferrerNameRegex = config.regex.serviceReferrerName;
 const macPatternRegex = config.regex.macPattern;
 const base64PatternRegex = config.regex.base64Pattern;
 const { queryKey, algorithm, encoding } = config.hmac;
-const { createHmacDigest } = require('../../../utils');
+const { createHmacDigest, base64Decode} = require('../../../utils');
 module.exports = superclass => class extends superclass {
   configure(req, res, next) {
     if (!req.query || !req.query.mac || !queryKey) {
@@ -38,8 +38,8 @@ module.exports = superclass => class extends superclass {
 
       if (mac === hashedAndHexed) {
         req.log('info', 'HMAC matched OK');
-        const decodedForm = atob(formBase64);
-        const decodedReturnUrl = atob(returnUrlBase64);
+        const decodedForm = base64Decode(formBase64);
+        const decodedReturnUrl = base64Decode(returnUrlBase64);
 
         if (decodedForm && serviceReferrerNameRegex.test(decodedForm)) {
           req.sessionModel.set('service-referrer-name', decodedForm);
