@@ -172,10 +172,11 @@ This will output a ready-to-use link with the HMAC for the given message, which 
 Example:
 
 ```bash
-node -e "const { createHmac } = require('node:crypto'); const { Buffer } = require('node:buffer'); const algorithm = 'sha256'; const key = 'skeletonKey'; const refObject = {form: Buffer.from('ASC', 'utf8').toString('base64'), returnUrl: Buffer.from('https://www.asc.homeoffice.gov.uk', 'utf8').toString('base64')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
+node -e "const { createHmac } = require('node:crypto'); const { Buffer } = require('node:buffer'); const algorithm = 'sha256'; const key = 'skeletonKey'; const refObject = {form: Buffer.from('Fake Form', 'utf8').toString('base64'), returnUrl: Buffer.from('https://www.fake-service.homeoffice.gov.uk', 'utf8').toString('base64')}; const message = JSON.stringify(refObject); const encoding = 'hex'; const hmac = createHmac(algorithm, key).update(message).digest(encoding); console.log('https://hof-feedback.homeoffice.gov.uk?form=' + refObject.form + '&returnUrl=' + refObject.returnUrl + '&mac=' + hmac);"
 ```
 Expected output:
 
 ```bash
-https://hof-feedback.homeoffice.gov.uk?form=TXkgSE8gRm9ybQ==&returnUrl=aHR0cHM6Ly93d3cubXktaG8tZm9ybS5ob21lb2ZmaWNlLmdvdi51aw==&mac=1a43ba473a484513462fc892223b4bdf280d0ee3050c8dc088d57fcbcef1bf95
+https://hof-feedback.homeoffice.gov.uk?form=RmFrZSBGb3Jt&returnUrl=aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr&mac=32a913dc951a771f7b8b8ac4e12db6cb615850fb23ac7cfc65d8ae06e62b5577
+
 ```
