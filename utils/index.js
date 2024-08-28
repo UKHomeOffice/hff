@@ -28,7 +28,7 @@ const createHmacDigest = (algorithm, key, message, encoding) => {
 };
 
 const hexDecode = data => {
-  return data ? Buffer.from(data, 'hex').toString('utf-8') : undefined;
+  return data ? Buffer.from(data, 'hex').toString('utf8') : undefined;
 };
 
 module.exports = { getLabel, createHmacDigest, hexDecode };
