@@ -27,6 +27,8 @@ const createHmacDigest = (algorithm, key, message, encoding) => {
   return createHmac(algorithm, key).update(message).digest(encoding);
 };
 
-const base64Decode = data => Buffer.from(data, 'base64').toString('utf-8');
+const hexDecode = data => {
+  return data ? Buffer.from(data, 'hex').toString('utf-8') : undefined;
+};
 
-module.exports = { getLabel, createHmacDigest, base64Decode};
+module.exports = { getLabel, createHmacDigest, hexDecode };
