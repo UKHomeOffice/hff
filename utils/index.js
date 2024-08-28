@@ -1,4 +1,5 @@
 const { createHmac } = require('node:crypto');
+const { Buffer } = require('node:buffer');
 const translations = require('../apps/hff/translations/src/en/fields.json');
 
 const getLabel = (fieldKey, fieldValue) => {
@@ -26,4 +27,6 @@ const createHmacDigest = (algorithm, key, message, encoding) => {
   return createHmac(algorithm, key).update(message).digest(encoding);
 };
 
-module.exports = { getLabel, createHmacDigest };
+const base64Decode = data => Buffer.from(data, 'base64').toString('utf-8');
+
+module.exports = { getLabel, createHmacDigest, base64Decode};
