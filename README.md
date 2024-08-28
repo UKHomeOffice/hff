@@ -95,8 +95,8 @@ Add some `feedback` values to your `config.js`:
 {
   feedback: {
     url: 'https://hof-feedback.homeoffice.gov.uk', // required if you want a feedback banner and link to feedback form
-    form: '46616b6520466f726d', // optional hex encoded form name if you want to include this context in the feedback notification email
-    returnUrl: '68747470733a2f2f7777772e66616b652d736572766963652e686f6d656f66666963652e676f762e756b', // optional hex encoded URL if you want a link back to your form in the feedback email
+    form: Buffer.from('<FORM>', 'utf-8').toString('hex'), // hex encode your form name if you want to include this context in the feedback notification email
+    returnUrl: Buffer.from('<RETURN URL>', 'utf-8').toString('hex'), // hex encode a URL if you want a link back to your form included in the feedback email
     mac: 'pre-hashed mac of the above two params in a JSON object string' // required if you add one or both of form and returnUrl
   }
 }
