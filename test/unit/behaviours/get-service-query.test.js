@@ -1,7 +1,14 @@
 const Behaviour = require('../../../apps/hff/behaviours/get-service-query');
 const reqres = require('hof').utils.reqres;
+
 const utils = require('../../../utils');
-jest.mock('../../../utils');
+jest.mock('../../../utils', () => {
+  const originalModule = jest.requireActual('../../../utils');
+  return {
+    ...originalModule,
+    createHmacDigest: jest.fn().mockReturnValue('5045060455395a109a61689ee2f5d989e3df3dc24e1768e00853b34b800df148')
+  };
+});
 
 describe('get-service-query behaviour', () => {
   test('Behaviour exports a function', () => {
@@ -38,8 +45,6 @@ describe('get-service-query behaviour', () => {
         returnUrl: 'aHR0cHM6Ly93d3cuZmFrZS1zZXJ2aWNlLmhvbWVvZmZpY2UuZ292LnVr',
         mac: '5045060455395a109a61689ee2f5d989e3df3dc24e1768e00853b34b800df148'
       };
-
-      utils.createHmacDigest.mockReturnValue('5045060455395a109a61689ee2f5d989e3df3dc24e1768e00853b34b800df148');
     });
 
 
