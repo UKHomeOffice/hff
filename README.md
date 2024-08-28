@@ -95,8 +95,8 @@ Add some `feedback` values to your `config.js`:
 {
   feedback: {
     url: 'https://hof-feedback.homeoffice.gov.uk', // required if you want a feedback banner and link to feedback form
-    form: Buffer.from('<FORM>', 'utf-8').toString('hex'), // hex encode your form name if you want to include this context in the feedback notification email
-    returnUrl: Buffer.from('<RETURN URL>', 'utf-8').toString('hex'), // hex encode a URL if you want a link back to your form included in the feedback email
+    form: Buffer.from('<FORM>', 'utf8').toString('hex'), // hex encode your form name if you want to include this context in the feedback notification email
+    returnUrl: Buffer.from('<RETURN URL>', 'utf8').toString('hex'), // hex encode a URL if you want a link back to your form included in the feedback email
     mac: 'pre-hashed mac of the above two params in a JSON object string' // required if you add one or both of form and returnUrl
   }
 }
@@ -114,9 +114,9 @@ res.locals.feedbackUrl = `${url}?form=${form}&returnUrl=${returnUrl}&mac=${mac}`
 
 Add and remove the query values from the above assignation as required.
 
-You can simply assign `config.feedback.url` to `res.locals.feedbackUrl` if you have no need to supply additional query context.
+Alternatively, the entire link can be generated and added as `config.feedback.url` with or without additional query context - See more in [Generating HMAC and Constructing URL](#generating-hmac-and-constructing-url)
 
-### Query parameters.
+### Query parameters
 
 When linking to this feedback form from other HOF forms you can add query context.
 
@@ -141,13 +141,13 @@ Including these parameters in links to this form is optional, but may improve th
 To have your query parameters trusted by this application, the `form` and `returnUrl` parameters need to be hex encoded. Additionally, the query parameters must be signed by an HMAC that is then appended to the query string as 'mac'. e.g.
 
 ```bash
-https://hof-feedback.homeoffice.gov.uk?form=ASC&returnUrl=https://www.asc.homeoffice.gov.uk
+https://hof-feedback.homeoffice.gov.uk?form=FakeForm&returnUrl=https://www.fake-service.homeoffice.gov.uk
 ```
 
 must become
 
 ```bash
-https://hof-feedback.homeoffice.gov.uk?form=QVND&returnUrl=aHR0cHM6Ly93d3cuYXNjLmhvbWVvZmZpY2UuZ292LnVr&mac=a9c42638a509cfa379e6bc2050e4ecea67b0b30f6706858772a13a5292951a66
+https://hof-feedback.homeoffice.gov.uk?form=46616b65466f726d&returnUrl=68747470733a2f2f7777772e66616b652d736572766963652e686f6d656f66666963652e676f762e756b&mac=6d227b0cd8c368ab1aec2ffd899811f3e3cccc2566cfa934191f4b4311fd9177
 ```
 
 The 'mac' parameter is generated as below from a hash of a JSON object string, a secret key and some settings for hashing algorithm and output encoding. The defaults are SHA256 hashing and hex encoding.
