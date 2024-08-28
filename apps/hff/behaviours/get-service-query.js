@@ -10,19 +10,19 @@ module.exports = superclass => class extends superclass {
       return super.process(req, res, next);
     }
 
-    const { form: formHex, returnUrl: returnUrlHex, mac } = req.query;
+    const { form: encodedForm, returnUrl: encodedReturnUrl, mac } = req.query;
 
     if (!macPatternRegex.test(mac)) {
       req.log('warn', 'MAC query parameter is not valid');
       return super.process(req, res, next);
     }
 
-    if (formHex && !hexPatternRegex.test(formHex)) {
+    if (encodedForm && !hexPatternRegex.test(encodedForm)) {
       req.log('warn', 'Form query parameter is not valid hex encoding');
       return super.process(req, res, next);
     }
 
-    if (returnUrlHex && !hexPatternRegex.test(returnUrlHex)) {
+    if (encodedReturnUrl && !hexPatternRegex.test(encodedReturnUrl)) {
       req.log('warn', 'ReturnURL query parameter is not valid hex encoding');
       return super.process(req, res, next);
     }
@@ -30,12 +30,12 @@ module.exports = superclass => class extends superclass {
     try {
       const comparisonObject = {};
 
-      if (formHex) {
-        comparisonObject.form = formHex;
+      if (encodedForm) {
+        comparisonObject.form = encodedForm;
       }
 
-      if (returnUrlHex) {
-        comparisonObject.returnUrl = returnUrlHex;
+      if (encodedReturnUrl) {
+        comparisonObject.returnUrl = encodedReturnUrl;
       }
 
       const comparisonString = JSON.stringify(comparisonObject);
@@ -43,8 +43,8 @@ module.exports = superclass => class extends superclass {
 
       if (mac === hashedAndHexed) {
         req.log('info', 'HMAC matched OK');
-        const decodedForm = hexDecode(formHex);
-        const decodedReturnUrl = hexDecode(returnUrlHex);
+        const decodedForm = hexDecode(encodedForm);
+        const decodedReturnUrl = hexDecode(encodedReturnUrl);
 
         if (decodedForm && serviceReferrerNameRegex.test(decodedForm)) {
           req.sessionModel.set('service-referrer-name', decodedForm);
