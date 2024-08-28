@@ -1,36 +1,41 @@
 const config = require('../../../config');
 const serviceReferrerNameRegex = config.regex.serviceReferrerName;
 const macPatternRegex = config.regex.macPattern;
-const base64PatternRegex = config.regex.base64Pattern;
+const hexPatternRegex = config.regex.hexPattern;
 const { queryKey, algorithm, encoding } = config.hmac;
-const { createHmacDigest, base64Decode} = require('../../../utils');
+const { createHmacDigest, hexDecode } = require('../../../utils');
 module.exports = superclass => class extends superclass {
-  configure(req, res, next) {
+  process(req, res, next) {
     if (!req.query || !req.query.mac || !queryKey) {
-      return super.configure(req, res, next);
+      return super.process(req, res, next);
     }
 
-    const { form: formBase64, returnUrl: returnUrlBase64, mac } = req.query;
+    const { form: formHex, returnUrl: returnUrlHex, mac } = req.query;
 
     if (!macPatternRegex.test(mac)) {
       req.log('warn', 'MAC query parameter is not valid');
-      return super.configure(req, res, next);
+      return super.process(req, res, next);
     }
 
-    if (!base64PatternRegex.test(formBase64) || !base64PatternRegex.test(returnUrlBase64)) {
-      req.log('warn', 'Either form or returnURL query parameter is invalid');
-      return super.configure(req, res, next);
+    if (formHex && !hexPatternRegex.test(formHex)) {
+      req.log('warn', 'Form query parameter is not valid hex encoding');
+      return super.process(req, res, next);
+    }
+
+    if (returnUrlHex && !hexPatternRegex.test(returnUrlHex)) {
+      req.log('warn', 'ReturnURL query parameter is not valid hex encoding');
+      return super.process(req, res, next);
     }
 
     try {
       const comparisonObject = {};
 
-      if (formBase64) {
-        comparisonObject.form = formBase64;
+      if (formHex) {
+        comparisonObject.form = formHex;
       }
 
-      if (returnUrlBase64) {
-        comparisonObject.returnUrl = returnUrlBase64;
+      if (returnUrlHex) {
+        comparisonObject.returnUrl = returnUrlHex;
       }
 
       const comparisonString = JSON.stringify(comparisonObject);
@@ -38,8 +43,8 @@ module.exports = superclass => class extends superclass {
 
       if (mac === hashedAndHexed) {
         req.log('info', 'HMAC matched OK');
-        const decodedForm = base64Decode(formBase64);
-        const decodedReturnUrl = base64Decode(returnUrlBase64);
+        const decodedForm = hexDecode(formHex);
+        const decodedReturnUrl = hexDecode(returnUrlHex);
 
         if (decodedForm && serviceReferrerNameRegex.test(decodedForm)) {
           req.sessionModel.set('service-referrer-name', decodedForm);
@@ -60,6 +65,6 @@ module.exports = superclass => class extends superclass {
     } catch (error) {
       req.log('error', 'There was a problem matching query to validation requirements', error);
     }
-    return super.configure(req, res, next);
+    return super.process(req, res, next);
   }
 };
