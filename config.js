@@ -21,7 +21,7 @@ module.exports = {
   },
   regex: {
     serviceReferrerName: /^[\w\s\-]*$/,
-    base64Pattern: /^[A-Za-z0-9+/=]+$/,
+    hexPattern: /^[a-fA-F0-9]+$/,
     macPattern: /^[a-fA-F0-9]{64}$/
   }
 };
