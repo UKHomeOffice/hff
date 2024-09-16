@@ -36,7 +36,7 @@ QUERY_KEY='A secret key used to verify HMAC signatures for queries sent to this 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/) - v.20.16.0 or compatible version
+- [Node.js](https://nodejs.org/en/) - v.20.17.0 or compatible version
 - [Redis server](http://redis.io/download) running on default port 6379
 
 ### Setup
