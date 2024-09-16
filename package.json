@@ -4,7 +4,7 @@
   "description": "A feedback form for users of other HOF services to fill",
   "main": "index.js",
   "engines": {
-    "node": ">=20.16.0"
+    "node": ">=20.17.0"
   },
   "scripts": {
     "start": "node server.js",
@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/UKHomeOffice/hff#readme",
   "dependencies": {
-    "hof": "^21.0.1",
-    "notifications-node-client": "^8.2.0"
+    "hof": "^21.1.1",
+    "notifications-node-client": "^8.2.1"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
