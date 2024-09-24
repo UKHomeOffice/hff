@@ -8,7 +8,7 @@ environment:
   PROD_ENV: sas-hff-prod
   UAT_ENV: sas-hff-uat
   BRANCH_ENV: sas-hff-branch
-  PRODUCTION_URL: https://www.hof-feedback.homeoffice.gov.uk
+  PRODUCTION_URL: www.hof-feedback.homeoffice.gov.uk
   IMAGE_URL: 340268328991.dkr.ecr.eu-west-2.amazonaws.com
   IMAGE_REPO: sas/hff
   GIT_REPO: UKHomeOffice/hff
@@ -114,7 +114,7 @@ steps:
       - name: dockersock
         path: /var/run
     when:
-      branch: 
+      branch:
         include:
         - master
         - feature/*
@@ -134,7 +134,7 @@ steps:
         - latest_${DRONE_BRANCH//\//-}
         - ${DRONE_COMMIT_SHA}
     when:
-      branch: 
+      branch:
         include:
         - master
         - feature/*
@@ -160,7 +160,7 @@ steps:
       - pull_request
       - push
       - tag
-  
+
   # Deploy to pull request Branch environment
   - name: deploy_to_branch
     pull: if-not-exists
@@ -253,7 +253,7 @@ steps:
     when:
       branch: master
       event: push
-  
+
   # Tear down pull request UAT environment
   - name: tear_down_branch
     pull: if-not-exists
@@ -354,7 +354,7 @@ steps:
     when:
       cron: security_scans
       event: cron
-  
+
   - name: cron_trivy_scan_image_os
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
@@ -367,7 +367,7 @@ steps:
     when:
       cron: security_scans
       event: cron
-    
+
   - name: cron_trivy_scan_node_packages
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
