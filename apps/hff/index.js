@@ -15,6 +15,8 @@ module.exports = {
     '/feedback-sent': {
       clearSession: true,
       backLink: false
-    }
+    },
+    '/session-timeout': {},
+    '/exit': {}
   }
 };

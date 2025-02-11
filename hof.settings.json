@@ -2,7 +2,8 @@
   "appName": "HOF feedback form",
   "theme": "govUK",
   "behaviours": [
-    "hof/components/clear-session"
+    "hof/components/clear-session",
+    "hof/components/session-timeout-warning"
   ],
   "translations": "./apps/hff/translations",
   "routes": [
