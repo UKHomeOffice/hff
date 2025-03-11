@@ -34,6 +34,7 @@ QUERY_KEY='A secret key used to verify HMAC signatures for queries sent to this 
 
 ## Install & Run the Application locally with Node.js
 
+
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/en/) - v.20.17.0 or compatible version
