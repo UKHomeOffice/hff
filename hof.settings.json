@@ -12,6 +12,6 @@
   "session": {
     "name": "hff.hof.sid"
   },
-  "getAccessibility": true,
+  "getAccessibility": false,
   "emailerFallback": true
 }

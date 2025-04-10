@@ -9,5 +9,8 @@
     "header": "Feedback sent",
     "intro": "Thank you for your feedback.",
     "link-text": "Return to the GOV.UK homepage"
+  },
+  "accessibility": {
+    "header": "Accessibility statement for this Home Office Forms Application"
   }
 }
