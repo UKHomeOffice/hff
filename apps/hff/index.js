@@ -18,5 +18,8 @@ module.exports = {
     },
     '/session-timeout': {},
     '/exit': {}
+  },
+  pages: {
+    '/accessibility': 'static/accessibility'
   }
 };
