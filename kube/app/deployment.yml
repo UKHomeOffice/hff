@@ -84,6 +84,8 @@ spec:
                   key: query-key
             - name: USE_MOCKS
               value: "false"
+            - name: GA_4_TAG
+              value: ""
           {{ if not (eq .KUBE_NAMESPACE .BRANCH_ENV) }}
           livenessProbe:
             httpGet:
