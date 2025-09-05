@@ -1,5 +1,5 @@
 {
-  "appName": "HOF feedback form",
+  "appName": "feedback form",
   "theme": "govUK",
   "behaviours": [
     "hof/components/clear-session",
