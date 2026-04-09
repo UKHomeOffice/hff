@@ -206,7 +206,7 @@ steps:
       event: pull_request
     depends_on:
       - clone_repos
-      - image_to_quay
+      - image_to_ecr
 
 
   # Deploy to master UAT environment
@@ -226,7 +226,7 @@ steps:
       event: push
     depends_on:
       - clone_repos
-      - image_to_quay
+      - image_to_ecr
 
   # Get pull request branch so correct PR UAT environment is torn down in the tear_down_branch step that follows
   - name: get_pr_branch
@@ -376,7 +376,7 @@ steps:
     image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/trivy/client:latest
     pull: always
     environment:
-      IMAGE_NAME: sas/hff:${DRONE_COMMIT_SHA}
+      IMAGE_NAME: hff:${DRONE_COMMIT_SHA}
       SEVERITY: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --dependency-tree
       FAIL_ON_DETECTION: true
       IGNORE_UNFIXED: false
@@ -400,11 +400,11 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-            *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *HOF Feedback Form - HFF* has failed.
+          *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *HOF Feedback Form - HFF* has failed.
 
-            Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
+          Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
-            *Build <{{build.link}}|#{{build.number}}>*
+          *Build <{{build.link}}|#{{build.number}}>*
       username: Drone_CI
       webhook:
         from_secret: slack_sas_hof_build_notify_webhook
@@ -424,11 +424,11 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-            *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *HOF Feedback Form - HFF* has failed.
+          *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *HOF Feedback Form - HFF* has failed.
 
-            Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
+          Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
-            *Build <{{build.link}}|#{{build.number}}>*
+          *Build <{{build.link}}|#{{build.number}}>*
       username: Drone_CI
       webhook:
         from_secret: slack_sas_hof_security_webhook
