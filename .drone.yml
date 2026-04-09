@@ -30,6 +30,10 @@ trigger:
   branch:
     <<: *include_default_and_feature_branches
 
+node_image: &node_image
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/hof-nodejs:20.20.2-alpine3.23@sha256:bcd17b68a0f1910f1670b07f6a47d1e2c28291bafc219807c494dc62b57ea25e
+
 linting: &linting
   <<: *node_image
   environment:
@@ -75,8 +79,7 @@ steps:
         cpu: 1000
         memory: 1024Mi
     environment:
-      IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:20.20.0-alpine3.23@sha256:55fe012b09506d6b70ecef4c425f149bd7f738839fee3dd05085bc45deceb4c3
-      SERVICE_URL: https://acp-trivy-helm.acp-trivy.svc.cluster.local:443
+      IMAGE_NAME: quay.io/ukhomeofficedigital/hof-nodejs:20.20.2-alpine3.23@sha256:bcd17b68a0f1910f1670b07f6a47d1e2c28291bafc219807c494dc62b57ea25e
       SEVERITY: MEDIUM,HIGH,CRITICAL  --dependency-tree
       FAIL_ON_DETECTION: false
       IGNORE_UNFIXED: false
@@ -265,6 +268,8 @@ steps:
       branch:
         <<: *include_default_branch
       event: push
+    depends_on:
+      - get_pr_branch
 
   # Checks a build being promoted has passed, is on master which effectively means a healthy build on Staging
   - name: sanity_check_build_prod
@@ -400,11 +405,11 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-          *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *HOF Feedback Form - HFF* has failed.
+            *✘ {{ uppercasefirst build.status }}*: CRON Job `tear_down_pr_envs` for *HOF Feedback Form - HFF* has failed.
 
-          Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
+            Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
-          *Build <{{build.link}}|#{{build.number}}>*
+            *Build <{{build.link}}|#{{build.number}}>*
       username: Drone_CI
       webhook:
         from_secret: slack_sas_hof_build_notify_webhook
@@ -424,11 +429,11 @@ steps:
       failure: ignore
       icon.url: https://readme.drone.io/logo.svg
       template: >
-          *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *HOF Feedback Form - HFF* has failed.
+            *✘ {{ uppercasefirst build.status }}*: CRON Job `security_scans` for *HOF Feedback Form - HFF* has failed.
 
-          Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
+            Branch <https://github.com/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}|{{build.branch}}> | Commit <https://github.com/{{ repo.owner }}/{{ repo.name }}/commit/{{ build.commit }}|{{ truncate build.commit 8 }}>
 
-          *Build <{{build.link}}|#{{build.number}}>*
+            *Build <{{build.link}}|#{{build.number}}>*
       username: Drone_CI
       webhook:
         from_secret: slack_sas_hof_security_webhook
