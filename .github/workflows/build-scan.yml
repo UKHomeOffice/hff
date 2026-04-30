@@ -1,0 +1,55 @@
+name: Building and scanning Docker images
+
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        description: "Directory to run npm audit in (default: repository root)"
+        required: false
+        type: string
+        default: "."
+      dockerfile:
+        description: "Directory/Name of the Dockerfile (default: Dockerfile)"
+        required: false
+        type: string
+        default: "Dockerfile"
+      image_name:
+        description: "Name of the image"
+        required: true
+        type: string
+      image_tag:
+        description: "The tag for the image (default: latest)"
+        required: false
+        type: string
+        default: latest
+      tag_latest:
+        description: "Should it also use the tag latest (default: true)"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  build-scan:
+    name: "Run docker build and then trivy scan"
+    runs-on: ubuntu-latest      
+
+    steps: 
+      - name: Checkout Code
+        uses: actions/checkout@v6
+      
+      - name: Set up Docker 
+        uses: UKHomeOffice/core-cloud-workflow-docker-actions/actions/setup@1.3.0
+      
+      - name: Build Docker Image
+        uses: UKHomeOffice/core-cloud-workflow-docker-actions/actions/build@1.3.0
+        with:
+          working_directory: ${{ inputs.working_directory }}
+          dockerfile: ${{ inputs.dockerfile }}
+          image_name: ${{ inputs.image_name }}
+          image_tag: ${{ inputs.image_tag }}
+          tag_latest: ${{ inputs.tag_latest }}
+      
+      - name: Scan Docker Image with Trivy
+        uses: UKHomeOffice/core-cloud-workflow-docker-actions/actions/scan@1.3.0
+        with:
+          image: ${{ inputs.image_name }}:${{ inputs.image_tag }}
