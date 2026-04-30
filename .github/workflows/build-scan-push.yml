@@ -1,0 +1,106 @@
+name: Building and scanning Docker images
+
+on:
+    pull_request:
+        branches:
+            - CCL-*
+    push:
+        branches:
+            - CCL-*
+            - master
+jobs:
+    prepare-tag-pr:
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        outputs:
+            short_sha: ${{ steps.tag-vars.outputs.short_sha }}
+            sanitized_branch: ${{ steps.tag-vars.outputs.sanitized_branch }}
+        steps:
+            - id: tag-vars
+              env:
+                  RAW_BRANCH: ${{ github.head_ref || github.ref_name }}
+              run: |
+                  short_sha="${GITHUB_SHA::8}"
+                  sanitized_branch="$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9.-]+/-/g; s/^-+//; s/-+$//')"
+                  sanitized_branch="${sanitized_branch:0:40}"
+
+                  echo "short_sha=$short_sha" >> "$GITHUB_OUTPUT"
+                  echo "sanitized_branch=$sanitized_branch" >> "$GITHUB_OUTPUT"
+
+    build-scan-pr:
+        if: github.event_name == 'pull_request'
+        needs: prepare-tag-pr
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ needs.prepare-tag-pr.outputs.sanitized_branch }}-${{ needs.prepare-tag-pr.outputs.short_sha }}"
+            tag_latest: true
+            trivy_ignorefiles: ".trivyignore"
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            AWS_BASE_ECR_ACCOUNT_ID: ${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}
+            BASE_ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}:role/cc-bootstrap-ecr-github-push-role
+
+    prepare-tag-branch:
+        if: github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]')))
+        runs-on: ubuntu-latest
+        outputs:
+            sha_tag: ${{ steps.tag-vars.outputs.sha_tag }}
+            branch_tag: ${{ steps.tag-vars.outputs.branch_tag }}
+        steps:
+            - id: tag-vars
+              env:
+                  BRANCH_RAW: ${{ github.head_ref || github.ref_name }}
+              run: |
+                  BRANCH_SANITIZED="$(echo "$BRANCH_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g' | cut -c1-50)"
+                  SHA_TAG="${GITHUB_SHA::8}"
+                  BRANCH_TAG="${BRANCH_SANITIZED}-latest"
+
+                  echo "sha_tag=$SHA_TAG" >> "$GITHUB_OUTPUT"
+                  echo "branch_tag=$BRANCH_TAG" >> "$GITHUB_OUTPUT"
+
+    build-scan-push-sha:
+        if: github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]')))
+        needs: prepare-tag-branch
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872 
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ needs.prepare-tag-branch.outputs.sha_tag }}"
+            tag_latest: false
+            trivy_ignorefiles: ".trivyignore"
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            AWS_BASE_ECR_ACCOUNT_ID: ${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}
+            BASE_ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}:role/cc-bootstrap-ecr-github-push-role
+
+    build-scan-push-branch:
+        if: github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]')))
+        needs: prepare-tag-branch
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app-branch"
+            image_tag: "${{ needs.prepare-tag-branch.outputs.branch_tag }}"
+            tag_latest: false
+            trivy_ignorefiles: ".trivyignore"
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            AWS_BASE_ECR_ACCOUNT_ID: ${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}
+            BASE_ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_BASE_ECR_ACCOUNT_ID }}:role/cc-bootstrap-ecr-github-push-role
