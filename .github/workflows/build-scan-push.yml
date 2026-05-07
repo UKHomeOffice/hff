@@ -1,0 +1,19 @@
+name: Building and scanning Docker images
+
+on:
+    push:
+        branches:
+            - CCL-8872
+jobs:
+    build-scan:
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872 
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hof-feedback-form"
+            image_tag: "latest"
+            tag_latest: true
+            trivy_ignorefiles: ".trivyignore"
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
