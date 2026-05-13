@@ -3,7 +3,7 @@ name: Building and scanning Docker images
 on:
     push:
         branches:
-            - CCL-8872
+            - CCL-8890
 jobs:
     build-scan:
         uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872 
