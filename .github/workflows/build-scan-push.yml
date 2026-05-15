@@ -4,6 +4,13 @@ on:
     push:
         branches:
             - CCL-8890
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+  security-events: write
+  pull-requests: write
+  
 jobs:
     build-scan:
         uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872 
