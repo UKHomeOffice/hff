@@ -14,7 +14,7 @@ jobs:
         with:
             working_directory: "."
             dockerfile: "Dockerfile"
-            image_name: "hof-feedback-form"
+            image_name: "hff/hff-app"
             image_tag: "latest"
             tag_latest: true
             trivy_ignorefiles: ".trivyignore"
