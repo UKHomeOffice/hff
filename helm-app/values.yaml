@@ -1,0 +1,170 @@
+# Default values for hff-app Helm chart
+
+# Global settings
+global:
+  namespace: default
+  environment: nonprod  # prod, uat, dev, branch
+
+# Application configuration
+app:
+  name: hff-cc
+  replicas: 1  # Will be overridden to 2 in prod
+  
+# Image configuration
+image:
+  repository: quay.io/ukhomeofficedigital/hff-cc
+  tag: latest  # Override with commit SHA in CI/CD
+  pullPolicy: Always
+
+# Container ports
+containerPorts:
+  app: 8080
+  nginx: 10443
+
+# Service configuration
+service:
+  type: ClusterIP
+  ports:
+    http: 10080
+    https: 10443
+
+# Ingress configuration
+ingress:
+  enabled: true
+  externalEnabled: true
+  internalEnabled: true
+  className: nginx-external
+  external:
+    hosts:
+      prod: ""  # Set to production URL for prod
+      uat: "hff-cc.uat.sas-notprod.homeoffice.gov.uk"
+      dev: "hff-cc.sas-notprod.homeoffice.gov.uk"
+      branch: ""  # Set based on branch name
+    tls:
+      certName: cert-cmio
+      branchCertName: branch-tls-external
+    annotations: {}
+      # Add ingress annotations here
+  internal:
+    hosts:
+      uat: "hff-cc.internal.uat.sas-notprod.homeoffice.gov.uk"
+      branch: ""  # Set based on branch name
+    tls:
+      certName: ingress-internal
+      branchCertName: branch-tls-internal
+    annotations: {}
+
+# Application environment variables
+env:
+  TZ: Europe/London
+  NODE_TLS_REJECT_UNAUTHORIZED: "0"
+  REDIS_PORT: "6379"
+  USE_MOCKS: "false"
+
+# Resource requests and limits
+resources:
+  app:
+    requests:
+      cpu: "20m"
+      memory: "100Mi"
+    limits:
+      cpu: "100m"
+      memory: "200Mi"
+  nginx:
+    requests:
+      memory: "10Mi"
+      cpu: "10m"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
+
+# Nginx proxy configuration
+nginx:
+  image: quay.io/ukhomeofficedigital/nginx-proxy-govuk@sha256:4470064d0b1d20ae08c5fd85551576cb687f342a22d6cb456fda9b2c4ce8c8df
+  settings: |
+    # Add nginx settings here
+    server_name _;
+    listen 10443 ssl http2;
+    absolute_redirect off;
+    server_tokens off;
+
+# Health checks (disabled for branch deployments)
+healthChecks:
+  enabled: true
+  liveness:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    path: /healthz/ping
+  readiness:
+    enabled: true
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    path: /healthz/readiness
+
+# ConfigMap data - override in environment-specific values
+configMap:
+  enabled: true
+  data: {}
+    # Add application configuration here
+
+# Secrets - reference to existing secrets
+secrets:
+  sessionSecret:
+    name: session-secret
+    key: session-secret
+  notifyKey:
+    name: notify-key
+    key: notify-key
+  queryKey:
+    name: query-key
+    key: query-key
+
+# Redis configuration
+redis:
+  enabled: true
+  name: redis
+  image: quay.io/ukhomeofficedigital/hof-docker-redis:7.0.15@sha256:cd4965fbb8aa6e4eba058985cc52f6a3ececdfa6d79ba44206f051f72a1f0611
+  port: 6379
+  replicas: 1
+  resources:
+    requests:
+      cpu: "20m"
+      memory: "100Mi"
+    limits:
+      cpu: "100m"
+      memory: "200Mi"
+
+# Network policies
+networkPolicies:
+  enabled: true
+  externalIngress: true
+  internalIngress: true
+  redisAccess: true
+
+# Certificates (cert-manager)
+certificates:
+  enabled: true
+  branch:
+    external:
+      enabled: true
+      commonName: "*.branch.sas-notprod.homeoffice.gov.uk"
+      issuer: letsencrypt-prod
+    internal:
+      enabled: true
+      commonName: "*.internal.branch.sas-notprod.homeoffice.gov.uk"
+      issuer: letsencrypt-prod
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+
+# Downscaler uptime for non-prod environments
+downscaler:
+  uptime: "Mon-Fri 08:00-18:00 UTC"  # Customize as needed
+
+# Branch deployment configuration
+branch:
+  enabled: false
+  name: ""  # Branch name will be set at deployment time
+  sourceUrl: ""  # Git source branch

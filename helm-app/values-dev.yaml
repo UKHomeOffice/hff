@@ -1,0 +1,38 @@
+# Development environment values
+global:
+  namespace: hff-dev
+  environment: dev
+
+app:
+  replicas: 1
+
+image:
+  tag: "dev-latest"
+  pullPolicy: Always
+
+ingress:
+  external:
+    hosts:
+      dev: "hff-cc.sas-notprod.homeoffice.gov.uk"
+
+configMap:
+  data:
+    NODE_ENV: development
+    LOG_LEVEL: debug
+    USE_MOCKS: "false"
+
+healthChecks:
+  enabled: false  # Often disabled for dev
+
+downscaler:
+  uptime: "Mon-Fri 08:00-18:00 UTC"
+
+redis:
+  replicas: 1
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+    limits:
+      cpu: "50m"
+      memory: "128Mi"

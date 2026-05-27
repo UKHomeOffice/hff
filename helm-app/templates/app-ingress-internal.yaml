@@ -1,0 +1,30 @@
+{{- if and .Values.ingress.internalEnabled (eq .Values.global.environment "uat") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.app.name }}-internal
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/name: hff-app
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+{{- toYaml .Values.ingress.internal.annotations | nindent 4 }}
+spec:
+  ingressClassName: nginx-internal
+  tls:
+  - hosts:
+    - {{ .Values.ingress.internal.hosts.uat }}
+    secretName: {{ .Values.ingress.internal.tls.certName }}
+  rules:
+  - host: {{ .Values.ingress.internal.hosts.uat }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.app.name }}
+            port:
+              number: {{ .Values.service.ports.https }}
+{{- end }}

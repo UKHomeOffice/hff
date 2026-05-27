@@ -1,0 +1,39 @@
+# UAT environment values
+global:
+  namespace: hff-uat
+  environment: uat
+
+app:
+  replicas: 1
+
+image:
+  tag: "latest"
+
+ingress:
+  external:
+    hosts:
+      uat: "hff-cc.uat.sas-notprod.homeoffice.gov.uk"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  internal:
+    hosts:
+      uat: "hff-cc.internal.uat.sas-notprod.homeoffice.gov.uk"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+configMap:
+  data:
+    NODE_ENV: uat
+    LOG_LEVEL: debug
+
+healthChecks:
+  enabled: true
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readiness:
+    initialDelaySeconds: 15
+    periodSeconds: 5
+
+downscaler:
+  uptime: "Mon-Fri 07:00-19:00 UTC"
