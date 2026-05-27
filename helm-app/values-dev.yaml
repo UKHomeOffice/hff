@@ -7,6 +7,7 @@ app:
   replicas: 1
 
 image:
+  repository: "335721753278.dkr.ecr.eu-west-2.amazonaws.com/hff/hff-app"
   tag: "latest"
   pullPolicy: Always
 
