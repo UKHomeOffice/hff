@@ -1,9 +1,14 @@
 name: Building and scanning Docker images
 
 on:
+    pull_request:
+        branches:
+            - CCL-*
+            - master
     push:
         branches:
-            - CCL-8890
+            - CCL-*
+            - master
   
 jobs:
     build-scan:
