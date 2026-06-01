@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+  name: redis-{{ .DRONE_SOURCE_BRANCH }}
+  {{ else }}
+  name: redis
+  {{ end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+      app: redis-{{ .DRONE_SOURCE_BRANCH }}
+      {{ else }}
+      app: redis
+      {{ end }}
+  template:
+    metadata:
+      labels:
+        {{ if eq .KUBE_NAMESPACE .BRANCH_ENV }}
+        name: redis-{{ .DRONE_SOURCE_BRANCH }}
+        service: redis-{{ .DRONE_SOURCE_BRANCH }}
+        app: redis-{{ .DRONE_SOURCE_BRANCH }}
+        {{ else }}
+        name: redis
+        service: redis
+        app: redis
+        {{ end }}
+    spec:
+      containers:
+        - name: redis
+          # redis:v7.0.15
+          image: quay.io/ukhomeofficedigital/hof-docker-redis:7.0.15@sha256:cd4965fbb8aa6e4eba058985cc52f6a3ececdfa6d79ba44206f051f72a1f0611
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /var/lib/redis
+              name: data
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "100Mi"
+            limits:
+              cpu: "100m"
+              memory: "200Mi"
+      volumes:
+        - name: data
+          emptyDir: {}
