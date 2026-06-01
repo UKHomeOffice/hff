@@ -15,7 +15,7 @@ jobs:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
-            image_tag: "latest"
+            image_tag: "hff-app-${{ github.sha }}"
             tag_latest: true
             trivy_ignorefiles: ".trivyignore"
         secrets:
