@@ -35,7 +35,7 @@ jobs:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
-            image_tag: "hff-app-${{ needs.prepare-tag.outputs.sanitized_branch }}-${{ needs.prepare-tag.outputs.short_sha }}"
+            image_tag: "${{ needs.prepare-tag.outputs.sanitized_branch }}-${{ needs.prepare-tag.outputs.short_sha }}"
             tag_latest: true
             trivy_ignorefiles: ".trivyignore"
         secrets:
