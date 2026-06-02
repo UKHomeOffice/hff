@@ -4,11 +4,9 @@ on:
     pull_request:
         branches:
             - CCL-*
-            - master
     push:
         branches:
             - CCL-*
-            - master
 jobs:
     validation:
         uses: Home-Office-Digital/core-cloud-workflow-node-yarn-actions/.github/workflows/validation.yml@1.3.1
