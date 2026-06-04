@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hff--config
+data:
+  app.yaml: |
+    environment: test
