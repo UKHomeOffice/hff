@@ -4,4 +4,4 @@ metadata:
   name: hff--config
 data:
   app.yaml: |
-    environment: test
+    environment: {{ .Values.sha }}
