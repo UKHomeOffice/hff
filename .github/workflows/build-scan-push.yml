@@ -7,6 +7,7 @@ on:
     push:
         branches:
             - CCL-*
+            - master
 jobs:
     prepare-tag:
         if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]'))))
