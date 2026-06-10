@@ -59,8 +59,8 @@ jobs:
                   BRANCH_RAW: ${{ github.head_ref || github.ref_name }}
               run: |
                   BRANCH_SANITIZED="$(echo "$BRANCH_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g' | cut -c1-50)"
-                  BRANCH_TAG="${BRANCH_SANITIZED}-latest"
                   SHA_TAG="${GITHUB_SHA::8}"
+                  BRANCH_TAG="${BRANCH_SANITIZED}-${SHA_TAG}"
 
                   echo "sha_tag=$SHA_TAG" >> "$GITHUB_OUTPUT"
                   echo "branch_tag=$BRANCH_TAG" >> "$GITHUB_OUTPUT"
