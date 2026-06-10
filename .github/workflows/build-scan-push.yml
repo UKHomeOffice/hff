@@ -4,6 +4,9 @@ on:
     pull_request:
         branches:
             - CCL-*
+    push:
+        branches:
+            - CCL-*
   
 jobs:
     prepare-tag:
