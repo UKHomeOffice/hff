@@ -7,9 +7,11 @@ on:
     push:
         branches:
             - CCL-*
+            - master
   
 jobs:
     prepare-tag:
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]'))))
         runs-on: ubuntu-latest
         outputs:
             short_sha: ${{ steps.tag-vars.outputs.short_sha }}
@@ -26,6 +28,7 @@ jobs:
                   echo "sanitized_branch=$sanitized_branch" >> "$GITHUB_OUTPUT"
 
     build-scan:
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref_name == 'master' || (startsWith(github.ref_name, 'CCL-') && contains(github.event.head_commit.message, '[publish-image]'))))
         needs: prepare-tag
         permissions:
             contents: read
