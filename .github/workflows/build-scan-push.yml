@@ -60,7 +60,7 @@ jobs:
               run: |
                   BRANCH_SANITIZED="$(echo "$BRANCH_RAW" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9-]+/-/g' | cut -c1-50)"
                   SHA_TAG="${GITHUB_SHA::8}"
-                  BRANCH_TAG="${BRANCH_SANITIZED}-${SHA_TAG}"
+                  BRANCH_TAG="${BRANCH_SANITIZED}-latest"
 
                   echo "sha_tag=$SHA_TAG" >> "$GITHUB_OUTPUT"
                   echo "branch_tag=$BRANCH_TAG" >> "$GITHUB_OUTPUT"
@@ -95,7 +95,7 @@ jobs:
         with:
             working_directory: "."
             dockerfile: "Dockerfile"
-            image_name: "hff/hff-app"
+            image_name: "chris-test"
             image_tag: "${{ needs.prepare-tag-branch.outputs.branch_tag }}"
             tag_latest: false
             trivy_ignorefiles: ".trivyignore"
