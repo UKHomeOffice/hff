@@ -7,7 +7,6 @@ on:
     push:
         branches:
             - CCL-*
-            - master
 jobs:
     prepare-tag-pr:
         if: github.event_name == 'pull_request'
