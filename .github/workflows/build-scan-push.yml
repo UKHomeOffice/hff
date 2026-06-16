@@ -3,6 +3,7 @@ name: Building and scanning Docker images
 on:
     pull_request:
         branches:
+            - master
             - CCL-*
     push:
         branches:
