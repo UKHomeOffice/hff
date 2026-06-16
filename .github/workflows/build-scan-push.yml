@@ -10,7 +10,29 @@ on:
             - master
   
 jobs:
+    prepare-image-tag:
+        runs-on: ubuntu-latest
+        outputs:
+            image_tag: ${{ steps.compute.outputs.image_tag }}
+        steps:
+            - name: Compute image tag
+              id: compute
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  BRANCH_NAME: ${{ github.head_ref }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+                  PUSH_SHA: ${{ github.sha }}
+              run: |
+                  if [ "$EVENT_NAME" = "pull_request" ]; then
+                    sanitized_branch=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
+                    short_sha=$(echo "$HEAD_SHA" | cut -c1-7)
+                    echo "image_tag=${sanitized_branch}-${short_sha}" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "image_tag=${PUSH_SHA}" >> "$GITHUB_OUTPUT"
+                  fi
+
     build-scan:
+        needs: prepare-image-tag
         permissions:
             contents: read
             id-token: write
@@ -19,7 +41,7 @@ jobs:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
-            image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}"
+            image_tag: ${{ needs.prepare-image-tag.outputs.image_tag }}
             tag_latest: true
             trivy_ignorefiles: ".trivyignore"
         secrets:
