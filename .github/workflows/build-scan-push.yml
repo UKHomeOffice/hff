@@ -25,7 +25,7 @@ jobs:
               run: |
                   if [ "$EVENT_NAME" = "pull_request" ]; then
                     sanitized_branch=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+|-+$//g')
-                    short_sha=$(echo "$HEAD_SHA" | cut -c1-7)
+                                        short_sha=$(echo "$HEAD_SHA" | cut -c1-8)
                     echo "image_tag=${sanitized_branch}-${short_sha}" >> "$GITHUB_OUTPUT"
                   else
                     echo "image_tag=${PUSH_SHA}" >> "$GITHUB_OUTPUT"
