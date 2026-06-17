@@ -6,7 +6,7 @@ on:
             - master
     push:
         branches:
-            - master
+            - CCL-9787
   
 jobs:
     build-scan:
@@ -18,7 +18,7 @@ jobs:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
-            image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.event.pull_request.head.sha }}"
+            image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.sha }}"
             tag_latest: true
             trivy_ignorefiles: ".trivyignore"
         secrets:
