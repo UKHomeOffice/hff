@@ -28,3 +28,4 @@ jest.config.json
 jest.env.js
 sonar-project.properties
 hof-services-config
+charts
