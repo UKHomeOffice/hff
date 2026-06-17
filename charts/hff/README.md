@@ -1,6 +1,6 @@
 # HFF App Helm Chart
 
-A comprehensive Helm chart for deploying the HFF (Home Office Form Framework) application on Kubernetes, including support for Redis caching, Nginx proxy, ingress, and network policies.
+A comprehensive Helm chart for deploying the HFF (HOF Feedback Form) application on Kubernetes, including support for Redis caching, Nginx proxy, ingress, and network policies.
 
 ## Overview
 
