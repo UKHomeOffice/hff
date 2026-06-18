@@ -17,6 +17,8 @@
     "test:unit": "jest --verbose test/unit",
     "bddgen": "bddgen",
     "test:e2e": "bddgen && playwright test",
+    "test:e2e:headed": "bddgen && playwright test --headed",
+    "test:e2e:debug": "bddgen && playwright test --debug",
     "test:e2e:report": "playwright show-report"
   },
   "repository": {
@@ -30,8 +32,8 @@
   },
   "homepage": "https://github.com/UKHomeOffice/hff#readme",
   "dependencies": {
-    "hof": "~22.10.4",
-    "notifications-node-client": "^8.2.1"
+    "hof": "~24.0.0",
+    "notifications-node-client": "^8.3.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.0.0",
