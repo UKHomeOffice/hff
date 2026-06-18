@@ -21,11 +21,15 @@ environment:
 include_default_branch: &include_default_branch
   include:
     - master
+  exclude:
+    - CCL-*
 
 include_default_and_feature_branches: &include_default_and_feature_branches
   include:
     - master
     - feature/*
+  exclude:
+    - CCL-*
     
 trigger:
   branch:
@@ -380,6 +384,7 @@ steps:
       event: push
     depends_on:
       - get_pr_branch
+      - deploy_to_uat
 
   # Checks a build being promoted has passed, is on master which effectively means a healthy build on Staging
   - name: sanity_check_build_prod
