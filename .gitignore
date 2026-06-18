@@ -17,3 +17,6 @@ apps/**/translations/**/*
 test/_accessibility/tmp/*
 .nyc_output
 .devcontainer/*.env
+.features-gen
+test-results
+playwright-report
