@@ -1,0 +1,55 @@
+name: Migrating Images from ACP to Core Cloud
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  migrate-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Validate migration secrets
+        shell: bash
+        env:
+          ACP_AWS_ECR_ACCOUNT_ID: ${{ secrets.ACP_AWS_ECR_ACCOUNT_ID }}
+          ACP_ROLE_TO_ASSUME: ${{ secrets.ACP_ROLE_TO_ASSUME }}
+          AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+          ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+          [[ -z "$ACP_AWS_ECR_ACCOUNT_ID" ]] && missing+=("ACP_AWS_ECR_ACCOUNT_ID")
+          [[ -z "$ACP_ROLE_TO_ASSUME" ]] && missing+=("ACP_ROLE_TO_ASSUME")
+          [[ -z "$AWS_ECR_ACCOUNT_ID" ]] && missing+=("AWS_ECR_ACCOUNT_ID")
+          [[ -z "$ROLE_TO_ASSUME" ]] && missing+=("ROLE_TO_ASSUME")
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required secrets:" >&2
+            printf ' - %s\n' "${missing[@]}" >&2
+            exit 1
+          fi
+          
+      - name: Copy image from ACP ECR to Core Cloud ECR
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/actions/copy@feature/CCL-8933
+        with:
+          source_aws_region: eu-west-2
+          source_aws_ecr_account_id: ${{ secrets.ACP_AWS_ECR_ACCOUNT_ID }}
+          source_role_to_assume: ${{ secrets.ACP_ROLE_TO_ASSUME }}
+          target_aws_region: eu-west-2
+          target_aws_ecr_account_id: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
+          target_role_to_assume: ${{ secrets.ROLE_TO_ASSUME }}
+          source_image_name: hff/hff-app
+          source_image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}
+          latest_image_count: "1"
+          target_image_name: hff/hff-app
+          target_image_tag: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}
+          tag_latest: true
