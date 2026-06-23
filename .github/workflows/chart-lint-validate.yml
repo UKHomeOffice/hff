@@ -1,0 +1,37 @@
+name: Lint and validate Helm chart
+
+on:
+    pull_request:
+        branches:
+            - master
+        paths:
+            - "charts/hff/**"
+            - ".github/workflows/chart-lint-validate.yml"
+            - ".github/workflows/reusable-helm-lint-validate.yml"
+    push:
+        branches:
+            - master
+        paths:
+            - "charts/hff/**"
+            - ".github/workflows/chart-lint-validate.yml"
+            - ".github/workflows/reusable-helm-lint-validate.yml"
+
+jobs:
+    chart-validation:
+        uses: ./.github/workflows/reusable-helm-lint-validate.yml
+        with:
+            chart_path: charts/hff
+            release_name: hff-app
+            set_values: |
+                global.namespace=ci
+                app.name=hff-app
+                image.repository=ghcr.io/example/hff
+                image.tag=ci
+                nginx.image=ghcr.io/example/nginx
+                redis.image=redis:7.2
+                secrets.sessionSecret.name=session-secret
+                secrets.sessionSecret.key=session-key
+                secrets.notifyKey.name=notify-secret
+                secrets.notifyKey.key=notify-key
+                secrets.queryKey.name=query-secret
+                secrets.queryKey.key=query-key
