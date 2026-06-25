@@ -60,7 +60,19 @@ jobs:
                   chart_directory: ${{ inputs.chart_directory || 'charts/hff' }}
 
             - name: Validate chart rendering
-              uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/validate@feature/helm-publish-ecr-action
-              with:
-                  chart_directory: ${{ inputs.chart_directory || 'charts/hff' }}
-                  run_unittest: false
+              shell: bash
+              run: |
+                  helm template hff-app "${{ inputs.chart_directory || 'charts/hff' }}" \
+                    --set global.namespace=ci \
+                    --set app.name=hff-app \
+                    --set image.repository=ghcr.io/example/hff \
+                    --set image.tag=ci \
+                    --set nginx.image=ghcr.io/example/nginx \
+                    --set redis.image=redis:7.2 \
+                    --set secrets.sessionSecret.name=session-secret \
+                    --set secrets.sessionSecret.key=session-key \
+                    --set secrets.notifyKey.name=notify-secret \
+                    --set secrets.notifyKey.key=notify-key \
+                    --set secrets.queryKey.name=query-secret \
+                    --set secrets.queryKey.key=query-key \
+                    > /dev/null
