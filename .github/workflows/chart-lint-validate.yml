@@ -26,6 +26,7 @@ on:
             - ".github/workflows/chart-lint-validate.yml"
     push:
         branches:
+            - CCL-*
             - master
         paths:
             - "charts/hff/**"
