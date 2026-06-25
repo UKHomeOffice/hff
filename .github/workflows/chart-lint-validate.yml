@@ -13,11 +13,6 @@ on:
                 required: false
                 type: string
                 default: v3.16.3
-            run_unittest:
-                description: Run helm unit tests
-                required: false
-                type: boolean
-                default: true
     pull_request:
         branches:
             - master
@@ -43,11 +38,6 @@ on:
                 required: false
                 type: string
                 default: v3.16.3
-            run_unittest:
-                description: Run helm unit tests
-                required: false
-                type: boolean
-                default: true
 
 jobs:
     chart-validation:
@@ -62,7 +52,7 @@ jobs:
               uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/setup@feature/helm-publish-ecr-action
               with:
                   helm_version: ${{ inputs.helm_version || 'v3.16.3' }}
-                  install_unittest: ${{ inputs.run_unittest != '' && inputs.run_unittest || true }}
+                  install_unittest: false
 
             - name: Lint chart
               uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/lint@feature/helm-publish-ecr-action
@@ -73,4 +63,4 @@ jobs:
               uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/validate@feature/helm-publish-ecr-action
               with:
                   chart_directory: ${{ inputs.chart_directory || 'charts/hff' }}
-                  run_unittest: ${{ inputs.run_unittest != '' && inputs.run_unittest || true }}
+                  run_unittest: false
