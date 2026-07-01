@@ -7,7 +7,7 @@ global:
 
 # Application configuration
 app:
-  name: ""
+  name: "hff-app"
   replicas: 1
 
 # Optional additional labels applied to app and redis resources
