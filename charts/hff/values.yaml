@@ -2,12 +2,12 @@
 
 # Global settings
 global:
-  namespace: "hff-app"
-  environment: "dev"
+  namespace: hff-app
+  environment: dev
 
 # Application configuration
 app:
-  name: "hff-app"
+  name: hff-app
   replicas: 1
 
 # Optional additional labels applied to app and redis resources
@@ -15,8 +15,8 @@ commonLabels: {}
 
 # Image configuration
 image:
-  repository: ""
-  tag: ""
+  repository: ghcr.io/ukhomeoffice/hff-app
+  tag: latest
   pullPolicy: Always
 
 # Container ports
@@ -70,7 +70,7 @@ resources:
 
 # Nginx proxy configuration
 nginx:
-  image: ""
+  image: ghcr.io/nginxinc/nginx-unprivileged:1.27-alpine
 
 # Health checks
 healthChecks:
@@ -100,18 +100,18 @@ externalSecrets:
 # Secrets
 secrets:
   sessionSecret:
-    name: ""
-    key: ""
+    name: hff-app-secrets
+    key: sessionSecret
     remoteKey: ""
     remoteProperty: ""
   notifyKey:
-    name: ""
-    key: ""
+    name: hff-app-secrets
+    key: notifyKey
     remoteKey: ""
     remoteProperty: ""
   queryKey:
-    name: ""
-    key: ""
+    name: hff-app-secrets
+    key: queryKey
     remoteKey: ""
     remoteProperty: ""
 
@@ -119,7 +119,7 @@ secrets:
 redis:
   enabled: false
   name: redis
-  image: ""
+  image: redis:7.2-alpine
   port: 6379
   replicas: 1
   resources:
