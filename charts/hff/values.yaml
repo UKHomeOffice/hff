@@ -2,8 +2,8 @@
 
 # Global settings
 global:
-  namespace: ""
-  environment: ""
+  namespace: "hff-app"
+  environment: "dev"
 
 # Application configuration
 app:
