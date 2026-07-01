@@ -117,7 +117,7 @@ secrets:
 
 # Redis configuration
 redis:
-  enabled: true
+  enabled: false
   name: redis
   image: ""
   port: 6379
