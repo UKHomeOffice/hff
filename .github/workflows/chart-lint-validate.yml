@@ -1,79 +1,19 @@
 name: Lint and validate Helm chart
 
 on:
-    workflow_call:
-        inputs:
-            chart_directory:
-                description: Path to the Helm chart directory
-                required: false
-                type: string
-                default: charts/hff
-            helm_version:
-                description: Helm version to install
-                required: false
-                type: string
-                default: v3.16.3
     pull_request:
         branches:
             - master
             - CCL-*
-        paths:
-            - "charts/hff/**"
-            - ".github/workflows/chart-lint-validate.yml"
     push:
         branches:
             - CCL-*
             - master
-        paths:
-            - "charts/hff/**"
-            - ".github/workflows/chart-lint-validate.yml"
-    workflow_dispatch:
-        inputs:
-            chart_directory:
-                description: Path to the Helm chart directory
-                required: false
-                type: string
-                default: charts/hff
-            helm_version:
-                description: Helm version to install
-                required: false
-                type: string
-                default: v3.16.3
 
 jobs:
-    chart-validation:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Helm
-              uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/setup@feature/helm-publish-ecr-action
-              with:
-                  helm_version: ${{ inputs.helm_version || 'v3.16.3' }}
-                  install_unittest: false
-
-            - name: Lint chart
-              uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/actions/lint@feature/helm-publish-ecr-action
-              with:
-                  chart_directory: ${{ inputs.chart_directory || 'charts/hff' }}
-
-            - name: Validate chart rendering
-              shell: bash
-              run: |
-                  helm template hff-app "${{ inputs.chart_directory || 'charts/hff' }}" \
-                    --set global.namespace=ci \
-                    --set app.name=hff-app \
-                    --set image.repository=ghcr.io/example/hff \
-                    --set image.tag=ci \
-                    --set nginx.image=ghcr.io/example/nginx \
-                    --set redis.image=redis:7.2 \
-                    --set secrets.sessionSecret.name=session-secret \
-                    --set secrets.sessionSecret.key=session-key \
-                    --set secrets.notifyKey.name=notify-secret \
-                    --set secrets.notifyKey.key=notify-key \
-                    --set secrets.queryKey.name=query-secret \
-                    --set secrets.queryKey.key=query-key \
-                    > /dev/null
+  validation:
+    uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/.github/workflows/validation.yml@1.0.0
+    with:
+      chart_directory: "charts"
+      helm_version: ""
+      run_unittest: true
