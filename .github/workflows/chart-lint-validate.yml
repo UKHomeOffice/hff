@@ -14,6 +14,6 @@ jobs:
   validation:
     uses: Home-Office-Digital/core-cloud-workflow-helm-ecr-actions/.github/workflows/validation.yml@1.0.0
     with:
-      chart_directory: "charts"
+      chart_directory: "charts/hff"
       helm_version: ""
       run_unittest: true
