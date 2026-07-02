@@ -17,7 +17,7 @@ commonLabels: {}
 image:
   repository: ghcr.io/ukhomeoffice/hff-app
   tag: latest
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 # Container ports
 containerPorts:
