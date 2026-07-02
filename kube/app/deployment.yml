@@ -111,7 +111,7 @@ spec:
 
         - name: nginx-proxy
           # nginx-proxy-govuk:v4
-          image: quay.io/ukhomeofficedigital/nginx-proxy-govuk@sha256:4470064d0b1d20ae08c5fd85551576cb687f342a22d6cb456fda9b2c4ce8c8df
+          image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/sas/hof-docker-nginx-proxy@sha256:4e5dad407fe0ce3095cde18de18c13b4b6c73df092a35bbcf7b86f52090415bd
           resources:
             requests:
               memory: 10Mi
