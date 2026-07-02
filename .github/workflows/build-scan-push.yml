@@ -13,14 +13,13 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@feature/CCL-8872
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@main
         with:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
             image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}"
             tag_latest: true
-            trivy_ignorefiles: ".trivyignore"
         secrets:
             AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
             ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
