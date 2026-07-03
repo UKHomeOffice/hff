@@ -184,3 +184,48 @@ Expected output:
 https://hof-feedback.homeoffice.gov.uk?form=46616b6520466f726d&returnUrl=68747470733a2f2f7777772e66616b652d736572766963652e686f6d656f66666963652e676f762e756b&mac=ab0c7700775d6bcc9a2438b967cc0623c35943b3d9bf50808eedd86b05c673a3
 
 ```
+
+## GitHub Actions
+
+This repository uses GitHub Actions workflows in `.github/workflows/` to run CI checks and security scans.
+
+### Workflows at a glance
+
+- **`yarn-validate-build-publish.yml`**  
+  Runs Node/Yarn checks:
+  - `validation`: audit, lint, and tests
+  - `build-publish`: build only (`should_publish: false`, so it does not publish packages)
+  - Triggered on:
+    - Pull requests to `master`
+    - Pushes to `CCL-*` branches
+
+- **`build-scan-push.yml`**  
+  Builds Docker image and runs container scanning using shared Home Office workflow actions.
+  - Triggered on:
+    - Pull requests to `master`
+    - Pushes to `master` and `CCL-*`
+
+- **`chart-lint-validate.yml`**  
+  Validates the Helm chart in `charts/hff` using shared Helm workflow actions.
+  - Triggered on:
+    - Pull requests to `master` and `CCL-*`
+    - Pushes to `master` and `CCL-*`
+    - Manual runs (`workflow_dispatch`)
+    - Reuse by other workflows (`workflow_call`)
+
+- **`scan-for-evil-packages.yml`**  
+  Runs package security scan via repository dispatch (`trigger-from-scanmaestro`).
+
+### Secrets used by workflows
+
+Make sure the following repository/org secrets are configured where relevant:
+
+- `AWS_ECR_ACCOUNT_ID`
+- `ROLE_TO_ASSUME`
+- `SLACK_WEBHOOK_URL`
+
+### Github Action tips
+
+1. Open the **Actions** tab in GitHub to see workflow runs and logs.
+2. For branch work, expect Yarn validation/build and Helm validation on `CCL-*` pushes.
+3. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.
