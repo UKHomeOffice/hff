@@ -14,7 +14,7 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.4.0
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
         with:
             working_directory: "."
             dockerfile: "Dockerfile"
@@ -24,3 +24,5 @@ jobs:
         secrets:
             AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
             ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+            EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
