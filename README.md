@@ -229,4 +229,3 @@ Make sure the following repository/org secrets are configured where relevant:
 1. Open the **Actions** tab in GitHub to see workflow runs and logs.
 2. For branch work, expect Yarn validation/build and Helm validation on `CCL-*` pushes.
 3. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.
-
