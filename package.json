@@ -4,7 +4,7 @@
   "description": "A feedback form for users of other HOF services to fill",
   "main": "index.js",
   "engines": {
-    "node": ">=24.15.0 <25.0.0"
+    "node": ">=24.18.0 <25.0.0"
   },
   "scripts": {
     "start": "node server.js",
