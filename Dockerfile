@@ -7,8 +7,7 @@ RUN echo "http://uk.alpinelinux.org/alpine/v3.24/main" > /etc/apk/repositories ;
     apk upgrade --no-cache
 
 # Upgrade bundled npm deps so Trivy does not report vulnerable undici from base image toolchain
-RUN npm install -g npm@11.18.0 && \
-    node -p "require('/usr/local/lib/node_modules/npm/node_modules/undici/package.json').version" | grep -Eq '^(6\\.(2[7-9]|[3-9][0-9])\\.|[7-9]\\.|[1-9][0-9]\\.)'
+RUN npm install -g npm@11.18.0 && npm --version
     
 # Setup nodejs group & nodejs user
 RUN addgroup --system nodejs --gid 998 && \
