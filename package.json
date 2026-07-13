@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/UKHomeOffice/hff#readme",
   "dependencies": {
-    "hof": "~24.3.0",
+    "hof": "~24.4.0",
     "notifications-node-client": "^8.4.0"
   },
   "devDependencies": {
