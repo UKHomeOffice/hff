@@ -1,0 +1,9 @@
+{{<partials-page}} {{$pageTitle}} {{#t}}pages.feedback2.title{{/t}} &ndash; GOV.UK {{/pageTitle}} {{$page-content}} <h1
+  class="govuk-heading-l">{{#t}}pages.feedback2.header{{/t}}</h1>
+  <p class="govuk-body">{{#t}}pages.feedback2.intro{{/t}}</p>
+  {{#fields}}
+  {{#renderField}}{{/renderField}}
+  {{/fields}}
+  {{#input-submit}}send-feedback{{/input-submit}}
+  {{/page-content}}
+  {{/partials-page}}

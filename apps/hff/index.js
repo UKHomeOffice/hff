@@ -10,7 +10,7 @@ module.exports = {
       fields: ['satisfaction', 'improvements'],
       behaviours: [getServiceQuery, submitFeedback],
       next: '/feedback-sent',
-      template: 'feedback'
+      template: process.env.TOGGLE == 'true' ? 'feedback' : 'feedback2'
     },
     '/feedback-sent': {
       clearSession: true,
