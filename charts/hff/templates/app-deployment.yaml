@@ -48,6 +48,8 @@ spec:
         - configMapRef:
             name: {{ required "app.name is required" .Values.app.name }}-configmap
         env:
+        - name: TOGGLE
+          value: true
         - name: TZ
           value: {{ .Values.env.TZ }}
         - name: NODE_TLS_REJECT_UNAUTHORIZED

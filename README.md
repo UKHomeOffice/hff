@@ -63,7 +63,7 @@ By following these steps, you should be able to install and run your application
 
 3. Ensure that your `.env` file has `REDIS_HOST=hof-redis` (or the value is the hostname of your redis instance as given in `docker-compose.yml`).
 
-4. From the root folder of this project run: `docker-compose up` or use `docker-compose up -d` to run in detatched mode.
+4. From the root folder of this project run: `docker-compose up` or use `docker-compose up -d` to run in detatched mode. The compose service is pinned to `linux/amd64`, so local Docker builds use the same platform consistently on Apple Silicon and Intel hosts.
 
 5. The application should build and start automatically with all required containers and environment.
 
