@@ -10,7 +10,7 @@ on:
             - CCL-*
   
 jobs:
-    build-scan:
+    build-scan-hofnotprod:
         permissions:
             contents: read
             id-token: write
@@ -22,7 +22,26 @@ jobs:
             image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.sha }}"
             tag_latest: true
         secrets:
-            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
-            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
             EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
             EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+
+    build-scan-hofprod:
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}"
+            tag_latest: true
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFPROD_ROLE_TO_ASSUME }}
+            EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+            EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+            
