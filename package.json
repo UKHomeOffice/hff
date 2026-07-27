@@ -36,8 +36,8 @@
     "notifications-node-client": "^8.4.0"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^13.0.0",
-    "@playwright/test": "^1.61.1",
+    "@cucumber/cucumber": "^13.2.0",
+    "@playwright/test": "^1.62.0",
     "@types/node": "^25.9.5",
     "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
