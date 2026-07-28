@@ -7,6 +7,8 @@ export CONFIGMAP_VALUES=$HOF_CONFIG/configmap-values.yaml
 export NGINX_SETTINGS=$HOF_CONFIG/nginx-settings.yaml
 
 kd='kd --insecure-skip-tls-verify --timeout 10m --check-interval 10s'
+redis_storage_files='kube/redis/redis-persistent-volume.yml'
+redis_runtime_files='kube/redis/redis-service.yml -f kube/redis/redis-network-policy.yml -f kube/redis/redis-deployment.yml'
 
 compute_branch_slug_max_length() {
   local dns_label_limit=63
@@ -107,6 +109,9 @@ normalize_redis_persistence_settings() {
   if [[ ${KUBE_NAMESPACE} == ${PROD_ENV} ]]; then
     REDIS_PERSISTENCE_ENABLED=true
     REDIS_PERSISTENCE_SIZE=10Gi
+  elif [[ ${KUBE_NAMESPACE} == ${BRANCH_ENV} ]]; then
+    REDIS_PERSISTENCE_ENABLED=true
+    REDIS_PERSISTENCE_SIZE=1Gi
   else
     REDIS_PERSISTENCE_ENABLED=false
   fi
@@ -120,24 +125,18 @@ normalize_redis_persistence_settings() {
 
 deploy_redis() {
   if [[ ${REDIS_PERSISTENCE_ENABLED} == "true" && -z "${REDIS_PERSISTENCE_EXISTING_CLAIM}" ]]; then
-    $kd -f kube/redis/redis-pvc.yml
+    $kd -f ${redis_storage_files}
   fi
 
-  $kd -f kube/redis/redis-config.yml \
-      -f kube/redis/redis-service.yml \
-      -f kube/redis/redis-network-policy.yml \
-      -f kube/redis/redis-deployment.yml
+  $kd -f kube/redis/redis-config.yml -f ${redis_runtime_files}
 }
 
 delete_redis() {
   if [[ ${REDIS_PERSISTENCE_ENABLED} == "true" && -z "${REDIS_PERSISTENCE_EXISTING_CLAIM}" ]]; then
-    $kd --delete -f kube/redis/redis-pvc.yml
+    $kd --delete -f ${redis_storage_files}
   fi
 
-  $kd --delete -f kube/redis/redis-config.yml \
-      -f kube/redis/redis-service.yml \
-      -f kube/redis/redis-network-policy.yml \
-      -f kube/redis/redis-deployment.yml
+  $kd --delete -f kube/redis/redis-config.yml -f ${redis_runtime_files}
 }
 
 if [[ $1 == 'tear_down' ]]; then
