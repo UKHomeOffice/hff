@@ -48,7 +48,7 @@ jobs:
     #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofnotprod-pattern-test:
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/CCL-')
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/CCL-'))
         permissions:
             contents: read
             id-token: write
