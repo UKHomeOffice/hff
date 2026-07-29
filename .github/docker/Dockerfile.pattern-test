@@ -1,6 +1,3 @@
-FROM alpine:3.22.0
+FROM scratch
 
-# Minimal image used only to validate ECR build/scan/push workflow wiring.
-RUN echo "pattern-test image" > /pattern-test.txt
-
-CMD ["cat", "/pattern-test.txt"]
+# Empty placeholder image used only to validate ECR build/scan/push workflow wiring.
