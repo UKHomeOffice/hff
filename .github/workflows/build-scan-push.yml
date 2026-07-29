@@ -8,6 +8,13 @@ on:
         branches:
             - master
             - CCL-*
+    workflow_dispatch:
+        inputs:
+            promote_to_prod:
+                description: "Promote NotProd pattern-test image to HOFProd"
+                required: true
+                type: boolean
+                default: false
   
 jobs:
     # Temporarily disabled actual HFF image jobs while CVE fixes are in progress.
@@ -48,7 +55,7 @@ jobs:
     #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofnotprod-pattern-test:
-        if: github.event_name == 'pull_request' || (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/CCL-') || github.ref == 'refs/heads/master'))
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/CCL-') || github.ref == 'refs/heads/master'))
         permissions:
             contents: read
             id-token: write
@@ -66,7 +73,7 @@ jobs:
             EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofprod-pattern-test:
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/CCL-')
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && inputs.promote_to_prod == true)
         needs: build-scan-hofnotprod-pattern-test
         runs-on: ubuntu-latest
         permissions:
