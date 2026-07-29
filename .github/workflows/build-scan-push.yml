@@ -73,7 +73,7 @@ jobs:
             EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofprod-pattern-test:
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && inputs.promote_to_prod == true)
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && inputs.promote_to_prod)
         needs: build-scan-hofnotprod-pattern-test
         runs-on: ubuntu-latest
         permissions:
