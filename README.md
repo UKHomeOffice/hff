@@ -204,6 +204,13 @@ This repository uses GitHub Actions workflows in `.github/workflows/` to run CI 
   - Triggered on:
     - Pull requests to `master`
     - Pushes to `master` and `CCL-*`
+  - Temporary CVE workaround:
+    - The real HFF image jobs are currently disabled while upstream CVE remediation is in progress.
+    - `build-scan-hofnotprod-pattern-test` builds a temporary `hff/hff-pattern-test` image in HOFNotProd.
+    - Pull requests to `master` tag the HOFNotProd test image as `pr-{number}-{sha}`.
+    - Pushes to `CCL-*` and `master` tag the HOFNotProd test image as `{sha}`.
+    - Pushes to `master` promote the exact HOFNotProd test image into HOFProd using `crane copy`, so both registries receive the same image digest.
+    - HOFProd promotion is a copy of the existing NotProd image, not a rebuild.
 
 - **`chart-lint-validate.yml`**  
   Validates the Helm chart in `charts/hff` using shared Helm workflow actions.
@@ -228,4 +235,5 @@ Make sure the following repository/org secrets are configured where relevant:
 
 1. Open the **Actions** tab in GitHub to see workflow runs and logs.
 2. For branch work, expect Yarn validation/build and Helm validation on `CCL-*` pushes.
-3. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.
+3. For the temporary pattern-test flow, validate HOFNotProd build/scan first, then confirm HOFProd promotion shows the same digest for the same SHA tag after a `master` merge.
+4. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.

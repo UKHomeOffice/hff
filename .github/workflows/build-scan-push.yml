@@ -48,14 +48,14 @@ jobs:
     #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofnotprod-pattern-test:
-        if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/CCL-'))
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/CCL-') || github.ref == 'refs/heads/master'))
         permissions:
             contents: read
             id-token: write
         uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
         with:
             working_directory: "."
-            dockerfile: ".github/docker/Dockerfile.pattern-test"
+            dockerfile: "Dockerfile.pattern-test"
             image_name: "hff/hff-pattern-test"
             image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.sha }}"
             tag_latest: false
@@ -66,7 +66,7 @@ jobs:
             EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
     build-scan-hofprod-pattern-test:
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/CCL-')
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         needs: build-scan-hofnotprod-pattern-test
         runs-on: ubuntu-latest
         permissions:
