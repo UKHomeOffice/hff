@@ -7,28 +7,45 @@ on:
     push:
         branches:
             - master
-            - CCL-*
-    workflow_dispatch:
   
 jobs:
     # Temporarily disabled actual HFF image jobs while CVE fixes are in progress.
     # TODO: Re-enable the real HFF image jobs once CVEs are remediated.
-    # build-scan-hofnotprod:
-    #     permissions:
-    #         contents: read
-    #         id-token: write
-    #     uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
-    #     with:
-    #         working_directory: "."
-    #         dockerfile: "Dockerfile"
-    #         image_name: "hff/hff-app"
-    #         image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.sha }}"
-    #         tag_latest: true
-    #     secrets:
-    #         AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
-    #         ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
-    #         EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
-    #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+    build-scan-hofnotprod:
+        if: github.event_name == 'pull_request'
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) }}"
+            tag_latest: false
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
+            EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+            EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+
+    build-scan-hofnotprod-uat:
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ github.sha }}"
+            tag_latest: false
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
+            EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+            EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }} 
 
     # build-scan-hofprod:
     #     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -48,35 +65,17 @@ jobs:
     #         EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
     #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
 
-    build-scan-hofnotprod-pattern-test:
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/CCL-') || github.ref == 'refs/heads/master'))
-        permissions:
-            contents: read
-            id-token: write
-        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
-        with:
-            working_directory: "."
-            dockerfile: "Dockerfile.pattern-test"
-            image_name: "hff/hff-pattern-test"
-            image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}"
-            tag_latest: false
-        secrets:
-            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
-            ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
-            EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
-            EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
-
-    build-scan-hofprod-pattern-test:
-        if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'workflow_dispatch'
-        needs: build-scan-hofnotprod-pattern-test
+    build-scan-hofprod:
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master')
+        needs: build-scan-hofnotprod-uat
         runs-on: ubuntu-latest
         permissions:
             contents: read
             id-token: write
         env:
             AWS_REGION: eu-west-2
-            ECR_REPOSITORY: hff/hff-pattern-test
-            SOURCE_IMAGE_TAG: ${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.sha) || github.sha }}
+            ECR_REPOSITORY: hff/hff-app
+            SOURCE_IMAGE_TAG: ${{ github.sha }}
             DESTINATION_IMAGE_TAG: ${{ github.sha }}
             SOURCE_REGISTRY: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
             DESTINATION_REGISTRY: ${{ secrets.HOFPROD_AWS_ECR_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
@@ -131,5 +130,108 @@ jobs:
                   if [ "$prod_digest" != "${{ steps.source_image.outputs.source_digest }}" ]; then
                       echo "Promoted digest mismatch: source=${{ steps.source_image.outputs.source_digest }} prod=$prod_digest"
                       exit 1
-                  fi
+                  fi    
+
+    # build-scan-hofnotprod-pattern-test:
+    #     if: github.event_name == 'pull_request'
+    #     permissions:
+    #         contents: read
+    #         id-token: write
+    #     uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+    #     with:
+    #         working_directory: "."
+    #         dockerfile: "Dockerfile.pattern-test"
+    #         image_name: "hff/hff-pattern-test"
+    #         image_tag: "${{ format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) }}"
+    #         tag_latest: false
+    #     secrets:
+    #         AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+    #         ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
+    #         EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+    #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+
+    # build-scan-hofnotprod-pattern-test-uat:
+    #     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    #     permissions:
+    #         contents: read
+    #         id-token: write
+    #     uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+    #     with:
+    #         working_directory: "."
+    #         dockerfile: "Dockerfile.pattern-test"
+    #         image_name: "hff/hff-pattern-test"
+    #         image_tag: "${{ github.sha }}"
+    #         tag_latest: false
+    #     secrets:
+    #         AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+    #         ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
+    #         EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
+    #         EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}            
+
+    # build-scan-hofprod-pattern-test:
+    #     if: (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    #     needs: build-scan-hofnotprod-pattern-test-uat
+    #     runs-on: ubuntu-latest
+    #     permissions:
+    #         contents: read
+    #         id-token: write
+    #     env:
+    #         AWS_REGION: eu-west-2
+    #         ECR_REPOSITORY: hff/hff-pattern-test
+    #         SOURCE_IMAGE_TAG: ${{ github.sha }}
+    #         DESTINATION_IMAGE_TAG: ${{ github.sha }}
+    #         SOURCE_REGISTRY: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
+    #         DESTINATION_REGISTRY: ${{ secrets.HOFPROD_AWS_ECR_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
+    #     steps:
+    #         - name: Install crane
+    #           run: |
+    #               curl -fsSL https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz -o /tmp/go-containerregistry.tar.gz
+    #               tar -xzf /tmp/go-containerregistry.tar.gz -C /tmp crane
+    #               sudo mv /tmp/crane /usr/local/bin/crane
+
+    #         - name: Configure AWS credentials for HOFNotProd
+    #           uses: aws-actions/configure-aws-credentials@v4
+    #           with:
+    #               role-to-assume: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
+    #               aws-region: ${{ env.AWS_REGION }}
+
+    #         - name: Read NotProd image digest and login source registry
+    #           id: source_image
+    #           run: |
+    #               source_ref="$SOURCE_REGISTRY/$ECR_REPOSITORY:$SOURCE_IMAGE_TAG"
+    #               source_digest=$(aws ecr describe-images \
+    #                   --repository-name "$ECR_REPOSITORY" \
+    #                   --image-ids imageTag="$SOURCE_IMAGE_TAG" \
+    #                   --query 'imageDetails[0].imageDigest' \
+    #                   --output text)
+
+    #               aws ecr get-login-password --region "$AWS_REGION" | crane auth login "$SOURCE_REGISTRY" -u AWS --password-stdin
+
+    #               echo "source_ref=$source_ref" >> "$GITHUB_OUTPUT"
+    #               echo "source_digest=$source_digest" >> "$GITHUB_OUTPUT"
+
+    #         - name: Configure AWS credentials for HOFProd
+    #           uses: aws-actions/configure-aws-credentials@v4
+    #           with:
+    #               role-to-assume: ${{ secrets.HOFPROD_ROLE_TO_ASSUME }}
+    #               aws-region: ${{ env.AWS_REGION }}
+
+    #         - name: Login destination registry and promote image
+    #           run: |
+    #               destination_ref="$DESTINATION_REGISTRY/$ECR_REPOSITORY:$DESTINATION_IMAGE_TAG"
+    #               aws ecr get-login-password --region "$AWS_REGION" | crane auth login "$DESTINATION_REGISTRY" -u AWS --password-stdin
+    #               crane copy "${{ steps.source_image.outputs.source_ref }}" "$destination_ref"
+
+    #         - name: Verify promoted digest matches source
+    #           run: |
+    #               prod_digest=$(aws ecr describe-images \
+    #                   --repository-name "$ECR_REPOSITORY" \
+    #                   --image-ids imageTag="$DESTINATION_IMAGE_TAG" \
+    #                   --query 'imageDetails[0].imageDigest' \
+    #                   --output text)
+
+    #               if [ "$prod_digest" != "${{ steps.source_image.outputs.source_digest }}" ]; then
+    #                   echo "Promoted digest mismatch: source=${{ steps.source_image.outputs.source_digest }} prod=$prod_digest"
+    #                   exit 1
+    #               fi
             
