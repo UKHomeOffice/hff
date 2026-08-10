@@ -47,7 +47,6 @@
   },
   "resolutions": {
     "axios": "^1.18.0",
-    "js-yaml": "^4.2.0",
     "@babel/core": "7.29.6",
     "brace-expansion": "^5.0.9",
     "js-yaml": "^4.3.0" 
