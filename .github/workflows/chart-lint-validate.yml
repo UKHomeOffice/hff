@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - CCL-*
   workflow_dispatch:
     inputs:
       chart_directory:
