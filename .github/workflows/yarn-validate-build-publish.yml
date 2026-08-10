@@ -3,10 +3,10 @@ name: Building and scanning Yarn Package
 on:
     pull_request:
         branches:
-            - master
+            - main
     push:
         branches:
-            - CCL-*
+            - main
 jobs:
     validation:
         uses: Home-Office-Digital/core-cloud-workflow-node-yarn-actions/.github/workflows/validation.yml@1.3.1
