@@ -1,13 +1,10 @@
-FROM node:24.18.0-alpine3.24@sha256:4ba75f835bb8802193e4c114572113d4b26f95f6f094f4b5229d2a77773e0afc
+FROM quay.io/ukhomeofficedigital/hof-nodejs:24.19.0-alpine3.24@sha256:a70b2f29d55a9aebcf89690e7f64f4889725dab87a3b22663d102ca17c5f888e 
 USER root
 
 # Switch to UK Alpine mirrors, update package index and upgrade all installed packages
 RUN echo "http://uk.alpinelinux.org/alpine/v3.24/main" > /etc/apk/repositories ; \
     echo "http://uk.alpinelinux.org/alpine/v3.24/community" >> /etc/apk/repositories ; \
     apk upgrade --no-cache
-
-# Upgrade bundled npm deps so Trivy does not report vulnerable undici from base image toolchain
-RUN npm install -g npm@12.0.0 && npm --version
     
 # Setup nodejs group & nodejs user
 RUN addgroup --system nodejs --gid 998 && \

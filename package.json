@@ -4,7 +4,7 @@
   "description": "A feedback form for users of other HOF services to fill",
   "main": "index.js",
   "engines": {
-    "node": ">=24.18.0 <25.0.0"
+    "node": ">=24.19.0 <25.0.0"
   },
   "scripts": {
     "start": "node server.js",
@@ -46,8 +46,10 @@
     "playwright-bdd": "^9.2.0"
   },
   "resolutions": {
-    "axios": "1.18.0",
-    "js-yaml": "4.2.0",
-    "@babel/core": "7.29.6"
+    "axios": "^1.18.0",
+    "js-yaml": "^4.2.0",
+    "@babel/core": "7.29.6",
+    "brace-expansion": "^5.0.9",
+    "js-yaml": "^4.3.0" 
   }
 }
