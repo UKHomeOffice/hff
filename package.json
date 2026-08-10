@@ -13,8 +13,9 @@
     "start:dev:docker": "hof-build watch",
     "build": "hof-build",
     "postinstall": "hof-build",
-    "test:lint": "eslint . --config ./node_modules/eslint-config-hof/default.js",
-    "test:unit": "jest --verbose test/unit",
+    "lint": "eslint . --config ./node_modules/eslint-config-hof/default.js",
+    "test": "yarn run unit",
+    "unit": "jest --verbose test/unit",
     "bddgen": "bddgen",
     "test:e2e": "bddgen && playwright test",
     "test:e2e:headed": "bddgen && playwright test --headed",
@@ -47,7 +48,6 @@
   },
   "resolutions": {
     "axios": "^1.18.0",
-    "js-yaml": "^4.2.0",
     "@babel/core": "7.29.6",
     "brace-expansion": "^5.0.9",
     "js-yaml": "^4.3.0" 

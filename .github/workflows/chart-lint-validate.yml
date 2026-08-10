@@ -3,12 +3,11 @@ name: Lint and validate Helm chart
 on:
   pull_request:
     branches:
-      - master
-      - CCL-*
+      - main
   push:
     branches:
+      - main
       - CCL-*
-      - master
   workflow_dispatch:
     inputs:
       chart_directory:
