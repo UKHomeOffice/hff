@@ -1,3 +1,0 @@
-FROM alpine:3.24.1
-
-# Minimal placeholder image used only to validate ECR build/scan/push workflow wiring.
