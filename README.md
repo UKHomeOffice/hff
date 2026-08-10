@@ -189,30 +189,6 @@ https://hof-feedback.homeoffice.gov.uk?form=46616b6520466f726d&returnUrl=6874747
 
 This repository uses GitHub Actions workflows in `.github/workflows/` to run CI checks and security scans.
 
-### Workflows at a glance
-
-- **`yarn-validate-build-publish.yml`**
-  - Runs Node/Yarn checks with Node.js `24.19.0`.
-  - Jobs:
-    - `validation`: audit, lint, and tests.
-    - `build-publish`: build only (`should_publish: false`).
-  - Triggered on pull requests to `main` and pushes to `main` and `CCL-*`.
-
-- **`build-scan-push.yml`**
-  - Builds and scans Docker images for HOFNotProd and promotes the same image to HOFProd on main pushes.
-  - Jobs:
-    - `build-scan-hofnotprod`: on pull requests to `main`, build/scan in HOFNotProd with tag `pr-{number}-{head_sha}`.
-    - `build-scan-hofnotprod-uat`: on pushes to `main`, build/scan in HOFNotProd with tag `${github.sha}`.
-    - `build-scan-hofprod`: on pushes to `main`, copy the HOFNotProd image to HOFProd with the same tag and verify source/prod digests match.
-  - Promotion uses image copy (`crane copy`) so HOFProd receives the same image digest, not a rebuild.
-
-- **`chart-lint-validate.yml`**
-  - Validates the Helm chart in `charts/hff` using the shared Helm workflow.
-  - Triggered on pull requests to `main`, pushes to `main` and `CCL-*`, manual runs (`workflow_dispatch`), and `workflow_call` reuse.
-
-- **`scan-for-evil-packages.yml`**
-  - Runs package security scanning via repository dispatch (`trigger-from-scanmaestro`).
-
 ### Secrets used by workflows
 
 Make sure the following repository/org secrets are configured where relevant:
