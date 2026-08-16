@@ -25,6 +25,18 @@ spec:
         app: {{ required "app.name is required" .Values.app.name }}
         service: {{ required "app.name is required" .Values.app.name }}
     spec:
+      {{- if .Values.podAntiAffinity.enabled }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: hff-app
+                    app.kubernetes.io/instance: {{ .Release.Name }}
+                topologyKey: topology.kubernetes.io/zone
+      {{- end }}
       {{- if .Values.tolerations }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
@@ -104,6 +116,18 @@ spec:
         ports:
         - containerPort: {{ .Values.containerPorts.nginx }}
           name: https
+        {{- if .Values.nginx.healthChecks.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: https
+          initialDelaySeconds: {{ .Values.nginx.healthChecks.initialDelaySeconds }}
+          periodSeconds: {{ .Values.nginx.healthChecks.periodSeconds }}
+        readinessProbe:
+          tcpSocket:
+            port: https
+          initialDelaySeconds: {{ .Values.nginx.healthChecks.initialDelaySeconds }}
+          periodSeconds: {{ .Values.nginx.healthChecks.periodSeconds }}
+        {{- end }}
         volumeMounts:
         - mountPath: /public
           name: public

@@ -71,6 +71,10 @@ resources:
 # Nginx proxy configuration
 nginx:
   image: ghcr.io/nginxinc/nginx-unprivileged:1.27-alpine
+  healthChecks:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
 
 # Health checks
 healthChecks:
@@ -122,6 +126,10 @@ redis:
   image: redis:7.2-alpine
   port: 6379
   replicas: 1
+  healthChecks:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
   resources:
     requests:
       cpu: "20m"
@@ -148,3 +156,12 @@ securityContext:
 
 # Pod scheduling overrides
 tolerations: []
+
+# Spread replicas across availability zones when possible
+podAntiAffinity:
+  enabled: true
+
+# Protect replicated application workloads during voluntary disruptions
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
