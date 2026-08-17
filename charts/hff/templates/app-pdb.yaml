@@ -1,0 +1,18 @@
+{{- if and .Values.podDisruptionBudget.enabled (gt (int .Values.app.replicas) 1) }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ required "app.name is required" .Values.app.name }}
+  namespace: {{ required "global.namespace is required" .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/name: hff-app
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "hff-app.commonLabels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hff-app
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

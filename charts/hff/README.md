@@ -211,6 +211,25 @@ healthChecks:
     periodSeconds: 5
 ```
 
+The nginx sidecar and Redis container also use TCP liveness and readiness probes by default. Configure their timings under `nginx.healthChecks` and `redis.healthChecks`.
+
+## Availability
+
+Pod anti-affinity is enabled by default to spread application and Redis replicas across availability zones when possible:
+
+```yaml
+podAntiAffinity:
+  enabled: true
+```
+
+For application deployments with more than one replica, a Pod Disruption Budget is enabled by default:
+
+```yaml
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+```
+
 ## Security
 
 ### Network Policies
