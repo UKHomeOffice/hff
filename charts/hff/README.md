@@ -119,7 +119,7 @@ env:
 ```
 
 #### Required Secret Inputs
-The application expects three Kubernetes Secret references to be provided through values:
+The application expects four Kubernetes Secret references to be provided through values:
 
 ```yaml
 secrets:
@@ -132,6 +132,9 @@ secrets:
   queryKey:
     name: <query-secret-name>
     key: <query-secret-key>
+  hofTestEmail:
+    name: <hof-test-email-secret-name>
+    key: <hof-test-email-secret-key>
 ```
 
 If `externalSecrets.enabled` is used, these secret names/keys are still the inputs the application consumes.

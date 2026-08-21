@@ -114,6 +114,11 @@ secrets:
     key: queryKey
     remoteKey: ""
     remoteProperty: ""
+  hofTestEmail:
+    name: sas-hof-email
+    key: sasHofEmail
+    remoteKey: ""
+    remoteProperty: ""
 
 # Redis configuration
 redis:
