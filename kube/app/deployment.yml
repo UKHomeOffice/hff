@@ -82,11 +82,6 @@ spec:
                 secretKeyRef:
                   name: query-key
                   key: query-key
-            - name: HOF_TEST_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: sas-hof-email
-                  key: sas-hof-email
             - name: USE_MOCKS
               value: "false"
           {{ if not (eq .KUBE_NAMESPACE .BRANCH_ENV) }}
