@@ -24,6 +24,18 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         {{- include "hff-app.commonLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.podAntiAffinity.enabled }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: redis
+                    app.kubernetes.io/instance: {{ .Release.Name }}
+                topologyKey: topology.kubernetes.io/zone
+      {{- end }}
       {{- if .Values.tolerations }}
       tolerations:
         {{- toYaml .Values.tolerations | nindent 8 }}
@@ -36,6 +48,18 @@ spec:
         ports:
         - containerPort: {{ .Values.redis.port }}
           name: redis
+        {{- if .Values.redis.healthChecks.enabled }}
+        livenessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: {{ .Values.redis.healthChecks.initialDelaySeconds }}
+          periodSeconds: {{ .Values.redis.healthChecks.periodSeconds }}
+        readinessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: {{ .Values.redis.healthChecks.initialDelaySeconds }}
+          periodSeconds: {{ .Values.redis.healthChecks.periodSeconds }}
+        {{- end }}
         volumeMounts:
         - mountPath: /var/lib/redis
           name: data

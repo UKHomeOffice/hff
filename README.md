@@ -36,7 +36,7 @@ QUERY_KEY='A secret key used to verify HMAC signatures for queries sent to this 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/en/) - v.20.17.0 or compatible version
+- [Node.js](https://nodejs.org/en/) - v24.19.0 or compatible v24 release
 - [Redis server](http://redis.io/download) running on default port 6379
 
 ### Setup
@@ -189,33 +189,6 @@ https://hof-feedback.homeoffice.gov.uk?form=46616b6520466f726d&returnUrl=6874747
 
 This repository uses GitHub Actions workflows in `.github/workflows/` to run CI checks and security scans.
 
-### Workflows at a glance
-
-- **`yarn-validate-build-publish.yml`**  
-  Runs Node/Yarn checks:
-  - `validation`: audit, lint, and tests
-  - `build-publish`: build only (`should_publish: false`, so it does not publish packages)
-  - Triggered on:
-    - Pull requests to `master`
-    - Pushes to `CCL-*` branches
-
-- **`build-scan-push.yml`**  
-  Builds Docker image and runs container scanning using shared Home Office workflow actions.
-  - Triggered on:
-    - Pull requests to `master`
-    - Pushes to `master` and `CCL-*`
-
-- **`chart-lint-validate.yml`**  
-  Validates the Helm chart in `charts/hff` using shared Helm workflow actions.
-  - Triggered on:
-    - Pull requests to `master` and `CCL-*`
-    - Pushes to `master` and `CCL-*`
-    - Manual runs (`workflow_dispatch`)
-    - Reuse by other workflows (`workflow_call`)
-
-- **`scan-for-evil-packages.yml`**  
-  Runs package security scan via repository dispatch (`trigger-from-scanmaestro`).
-
 ### Secrets used by workflows
 
 Make sure the following repository/org secrets are configured where relevant:
@@ -227,5 +200,7 @@ Make sure the following repository/org secrets are configured where relevant:
 ### Github Action tips
 
 1. Open the **Actions** tab in GitHub to see workflow runs and logs.
-2. For branch work, expect Yarn validation/build and Helm validation on `CCL-*` pushes.
-3. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.
+2. For feature branch work, expect Yarn and Helm checks on `CCL-*` pushes.
+3. For PRs into `main`, expect image build/scan in HOFNotProd.
+4. After merge to `main`, confirm HOFNotProd build and HOFProd promotion both complete and that digest verification passes.
+5. If a workflow fails, open the failed job, read the first failing step, and fix that specific issue before re-running.

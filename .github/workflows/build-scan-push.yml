@@ -3,14 +3,17 @@ name: Building and scanning Docker images
 on:
     pull_request:
         branches:
-            - master
+            - main
     push:
         branches:
-            - master
+            - main
             - CCL-*
   
 jobs:
-    build-scan:
+    # Temporarily disabled actual HFF image jobs while CVE fixes are in progress.
+    # TODO: Re-enable the real HFF image jobs once CVEs are remediated.
+    build-scan-hofnotprod:
+        if: github.event_name == 'pull_request'
         permissions:
             contents: read
             id-token: write
@@ -19,10 +22,26 @@ jobs:
             working_directory: "."
             dockerfile: "Dockerfile"
             image_name: "hff/hff-app"
-            image_tag: "${{ github.event_name == 'pull_request' && format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) || github.sha }}"
-            tag_latest: true
+            image_tag: "${{ format('pr-{0}-{1}', github.event.pull_request.number, github.event.pull_request.head.sha) }}"
+            tag_latest: false
         secrets:
-            AWS_ECR_ACCOUNT_ID: ${{ secrets.AWS_ECR_ACCOUNT_ID }}
-            ROLE_TO_ASSUME: ${{ secrets.ROLE_TO_ASSUME }}
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFNOTPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFNOTPROD_ROLE_TO_ASSUME }}
             EXEMPTIONS_APP_ID: ${{ secrets.EXEMPTIONS_APP_ID }}
             EXEMPTIONS_APP_PRIVATE_KEY: ${{ secrets.EXEMPTIONS_APP_PRIVATE_KEY }}
+
+    build-scan-hofprod:
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+            id-token: write
+        uses: Home-Office-Digital/core-cloud-workflow-docker-actions/.github/workflows/build-scan-push.yml@1.5.0
+        with:
+            working_directory: "."
+            dockerfile: "Dockerfile"
+            image_name: "hff/hff-app"
+            image_tag: "${{ github.sha }}"
+            tag_latest: false
+        secrets:
+            AWS_ECR_ACCOUNT_ID: ${{ secrets.HOFPROD_AWS_ECR_ACCOUNT_ID }}
+            ROLE_TO_ASSUME: ${{ secrets.HOFPROD_ROLE_TO_ASSUME }} 
