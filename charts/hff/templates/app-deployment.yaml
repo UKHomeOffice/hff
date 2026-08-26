@@ -59,6 +59,10 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ required "app.name is required" .Values.app.name }}-configmap
+        {{- if .Values.envFromSecret.enabled }}
+        - secretRef:
+            name: {{ required "envFromSecret.name is required when envFromSecret.enabled=true" .Values.envFromSecret.name }}
+        {{- end }}
         env:
         - name: TZ
           value: {{ .Values.env.TZ }}

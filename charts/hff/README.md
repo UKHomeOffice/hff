@@ -160,6 +160,31 @@ externalSecrets:
 
 `secretStoreRef` points to an existing `SecretStore` (or `ClusterSecretStore`) resource where provider details (for example AWS Secrets Manager region/auth) are defined.
 
+#### Environment Variables From A Secret
+
+Config that should not be held in the deployment repository can be supplied from a Secret instead of the ConfigMap. Every key in the Secret becomes an environment variable of the same name, so keys must be valid environment variable names.
+
+```yaml
+envFromSecret:
+  enabled: true
+  name: hff-app-config
+  remoteKey: <remote-secret-name-or-path>
+```
+
+- `name` is the Kubernetes Secret mounted into the app container via `envFrom`.
+- `remoteKey` is optional. When set alongside `externalSecrets.enabled`, an `ExternalSecret` is rendered that extracts every property of the remote secret into `name`. Leave it empty when the Secret is created outside this chart.
+
+The remote secret is expected to be a JSON object whose keys are the environment variable names, for example:
+
+```json
+{
+  "FEEDBACK_INBOX": "someone@example.gov.uk",
+  "FEEDBACK_TEMPLATE_ID": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+Precedence is worth noting. `envFrom` sources are applied in order, so this Secret overrides any key of the same name in the ConfigMap. Variables set explicitly in the container `env` list (`TZ`, `NODE_TLS_REJECT_UNAUTHORIZED`, `REDIS_PORT`, `REDIS_HOST`, `USE_MOCKS`, `SESSION_SECRET`, `NOTIFY_KEY`, `QUERY_KEY`) always win and cannot be overridden this way.
+
 ## Customization
 
 ### Custom ConfigMap Values

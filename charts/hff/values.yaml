@@ -119,6 +119,19 @@ secrets:
     remoteKey: ""
     remoteProperty: ""
 
+# Optional block of environment variables sourced from a Secret, for config that
+# should not be held in the deployment repository. Every key in the Secret becomes
+# an environment variable of the same name, so keys must be valid env var names.
+# Disabled by default; existing installations are unaffected.
+envFromSecret:
+  enabled: false
+  # Name of the Secret to mount via envFrom.
+  name: hff-app-config
+  # Optional. When set (and externalSecrets.enabled=true) an ExternalSecret is
+  # rendered that extracts every property of this remote secret into the Secret
+  # above. Leave empty if the Secret is managed outside this chart.
+  remoteKey: ""
+
 # Redis configuration
 redis:
   enabled: false
