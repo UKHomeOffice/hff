@@ -71,11 +71,6 @@ spec:
             secretKeyRef:
               name: {{ required "secrets.queryKey.name is required" .Values.secrets.queryKey.name }}
               key: {{ required "secrets.queryKey.key is required" .Values.secrets.queryKey.key }}
-        - name: HOF_TEST_EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: {{ required "secrets.hofTestEmail.name is required" .Values.secrets.hofTestEmail.name }}
-              key: {{ required "secrets.hofTestEmail.key is required" .Values.secrets.hofTestEmail.key }}
         - name: USE_MOCKS
           value: {{ .Values.env.USE_MOCKS | quote }}
         {{- if .Values.healthChecks.enabled }}

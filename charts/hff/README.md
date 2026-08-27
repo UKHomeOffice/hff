@@ -119,7 +119,7 @@ env:
 ```
 
 #### Required Secret Inputs
-The application expects four Kubernetes Secret references to be provided through values:
+The application expects three Kubernetes Secret references to be provided through values:
 
 ```yaml
 secrets:
