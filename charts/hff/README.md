@@ -132,9 +132,6 @@ secrets:
   queryKey:
     name: <query-secret-name>
     key: <query-secret-key>
-  hofTestEmail:
-    name: <hof-test-email-secret-name>
-    key: <hof-test-email-secret-key>
 ```
 
 If `externalSecrets.enabled` is used, these secret names/keys are still the inputs the application consumes.
