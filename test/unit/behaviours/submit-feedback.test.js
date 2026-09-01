@@ -7,7 +7,7 @@ jest.mock('../../../config.js', () => {
     ...originalModule,
     govukNotify: {
       notifyApiKey: 'test',
-      feedbackInbox: 'sas-hof-test@digital.homeoffice.gov.uk',
+      feedbackInbox: process.env.SAS_HOF_EMAIL,
       feedbackSubmissionTemplateId: '123-123'
     }
   };
@@ -80,7 +80,7 @@ describe('submit-feedback behaviour', () => {
       };
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail)
-        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+        .toHaveBeenCalledWith('123-123', process.env.SAS_HOF_EMAIL, { personalisation: emailProps });
     });
 
     test('Notify sendEmail called with the correct prop object (with service info)', async () => {
@@ -95,7 +95,7 @@ describe('submit-feedback behaviour', () => {
       };
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail)
-        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+        .toHaveBeenCalledWith('123-123', process.env.SAS_HOF_EMAIL, { personalisation: emailProps });
     });
 
     test('if getLabel function returns undefined a backup value is assigned to session', async () => {
@@ -110,7 +110,7 @@ describe('submit-feedback behaviour', () => {
       };
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail)
-        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+        .toHaveBeenCalledWith('123-123', process.env.SAS_HOF_EMAIL, { personalisation: emailProps });
     });
 
     test('(I can\'t get no) Satisfaction', async () => {
@@ -124,7 +124,7 @@ describe('submit-feedback behaviour', () => {
       };
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail)
-        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+        .toHaveBeenCalledWith('123-123', process.env.SAS_HOF_EMAIL, { personalisation: emailProps });
     });
 
     test('Notify sendEmail called with the correct prop object (no improvements)', async () => {
@@ -138,7 +138,7 @@ describe('submit-feedback behaviour', () => {
       };
       await instance.saveValues(req, res, next);
       expect(NotifyClient.prototype.sendEmail)
-        .toHaveBeenCalledWith('123-123', 'sas-hof-test@digital.homeoffice.gov.uk', { personalisation: emailProps });
+        .toHaveBeenCalledWith('123-123', process.env.SAS_HOF_EMAIL, { personalisation: emailProps });
     });
 
     test('Notify is not called when no feedback is given', async () => {
