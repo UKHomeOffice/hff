@@ -156,7 +156,15 @@ networkPolicies:
   enabled: true
   externalIngress: true
   internalIngress: true
+  # The namespaceSelectors below match nothing on the Core Cloud EKS clusters, so
+  # under default-deny these CIDR lists are what actually permit load balancer
+  # traffic and health checks. With target-type ip the ALB connects straight to
+  # pod IPs from its own ENIs, so the CIDRs must be the load balancer subnets.
+  #   internal: subnets tagged kubernetes.io/role/internal-elb
+  #   external: subnets tagged kubernetes.io/role/elb
+  # Leave a list empty if that ingress is not in use.
   internalIngressCIDRs: []
+  externalIngressCIDRs: []
   redisAccess: true
   egress:
     enabled: true
