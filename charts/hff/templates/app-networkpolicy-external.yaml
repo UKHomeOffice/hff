@@ -20,6 +20,10 @@ spec:
     - namespaceSelector:
         matchLabels:
           name: ingress-external
+    {{- range .Values.networkPolicies.externalIngressCIDRs }}
+    - ipBlock:
+        cidr: {{ . | quote }}
+    {{- end }}
     ports:
     - port: {{ .Values.containerPorts.app }}
       protocol: TCP

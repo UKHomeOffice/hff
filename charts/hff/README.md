@@ -259,7 +259,7 @@ podDisruptionBudget:
 
 ### Network Policies
 Network policies restrict traffic to and from the application:
-- External ingress from namespaces labeled `name=ingress-external`
+- External ingress from namespaces labeled `name=ingress-external` and optional CIDRs in `networkPolicies.externalIngressCIDRs`
 - Internal ingress from namespaces labeled `name=ingress-internal` and optional CIDRs in `networkPolicies.internalIngressCIDRs`
 - Redis access only from application pods
 
@@ -270,8 +270,29 @@ networkPolicies:
   externalIngress: true
   internalIngress: true
   internalIngressCIDRs: []
+  externalIngressCIDRs: []
   redisAccess: true
 ```
+
+#### Why the CIDR lists matter
+
+On the Core Cloud EKS clusters no namespace carries the `name=ingress-internal` or
+`name=ingress-external` label, so those namespace selectors match nothing. Under
+default-deny the CIDR lists are what actually permit load balancer traffic and
+health checks.
+
+Both ingresses use `alb.ingress.kubernetes.io/target-type: ip`, so the ALB connects
+directly to pod IPs from its own ENIs rather than via a node port. The CIDRs must
+therefore be the load balancer subnets:
+
+| List | Subnets |
+| --- | --- |
+| `internalIngressCIDRs` | tagged `kubernetes.io/role/internal-elb` |
+| `externalIngressCIDRs` | tagged `kubernetes.io/role/elb` |
+
+If you enable an ingress and leave its list empty, the ALB will be created and its
+listener rule will be correct, but it will not be able to reach the pods. Targets
+report unhealthy and requests return 503.
 
 ### Security Context
 All containers run as non-root:
