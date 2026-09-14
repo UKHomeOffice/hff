@@ -33,17 +33,17 @@
   "homepage": "https://github.com/UKHomeOffice/hff#readme",
   "dependencies": {
     "hof": "~24.5.0",
-    "notifications-node-client": "^8.4.0"
+    "notifications-node-client": "^8.5.0"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.1",
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^25.9.5",
     "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
     "eslint-config-hof": "^1.3.4",
-    "jest": "^30.4.2",
-    "playwright-bdd": "^9.2.0"
+    "jest": "^30.5.1",
+    "playwright-bdd": "^9.2.1"
   },
   "resolutions": {
     "axios": "^1.18.0",
