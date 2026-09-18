@@ -1,4 +1,4 @@
-# HFF App Helm Chart
+# HFF App Helm Chart - Demo Branch
 
 A comprehensive Helm chart for deploying the HFF (HOF Feedback Form) application on Kubernetes, including support for Redis caching, Nginx proxy, ingress, and network policies.
 
