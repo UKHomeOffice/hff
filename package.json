@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.1",
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^25.9.5",
     "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
